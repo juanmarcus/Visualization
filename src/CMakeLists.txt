@@ -1,9 +1,7 @@
-SET (sources
-    main.cpp
-)
+FILE (GLOB sources "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 
-SET (headers
-)
-
-add_executable (vis ${sources} ${headers})
-target_link_libraries (vis ${LIBS})
+FOREACH (source ${sources})
+    get_filename_component(target ${source} NAME_WE)
+    add_executable (${target} ${source})
+    target_link_libraries (${target} ${LIBS})
+ENDFOREACH(source)

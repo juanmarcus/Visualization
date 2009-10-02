@@ -13,6 +13,9 @@ CONFIGURE_FILE (
 ADD_CUSTOM_TARGET (uninstall
   "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake")
 
+# Verbose makefile
+#SET (CMAKE_VERBOSE_MAKEFILE ON)
+
 #find required packages
 find_package (Teem REQUIRED)
 
