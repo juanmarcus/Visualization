@@ -16,6 +16,9 @@ ADD_CUSTOM_TARGET (uninstall
 # Verbose makefile
 #SET (CMAKE_VERBOSE_MAKEFILE ON)
 
+# Fix Teem_DIR
+SET (Teem_DIR "/usr/local/lib")
+
 #find required packages
 find_package (Teem REQUIRED)
 
