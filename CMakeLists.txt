@@ -14,10 +14,10 @@ ADD_CUSTOM_TARGET (uninstall
   "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake")
 
 # Verbose makefile
-#SET (CMAKE_VERBOSE_MAKEFILE ON)
+SET (CMAKE_VERBOSE_MAKEFILE ON)
 
 # Fix Teem_DIR
-SET (Teem_DIR "/usr/local/lib")
+SET (Teem_DIR "/usr/local/lib" CACHE STRING "Directory with TeemConfig.cmake")
 
 #find required packages
 find_package (Teem REQUIRED)
