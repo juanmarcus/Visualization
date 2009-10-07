@@ -99,6 +99,8 @@ int main(int argc, char **argv)
 	muu->hctx->cam->faar = 2;
 	muu->hctx->cam->dist = 0;
 
+	muu->hctx->cam->fov = 20.0;
+
 	muu->nsin = nin;
 
 	muu->hctx->volSize[0] = nin->axis[0].size;
