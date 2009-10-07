@@ -75,7 +75,7 @@ int main(int argc, char **argv)
 	muu->lit->vsp[0] = AIR_TRUE;
 	strncpy(muu->shadeStr, "phong:gage(scalar:n)", AIR_STRLEN_MED - 1);
 	strncpy(muu->normalStr, "", AIR_STRLEN_MED - 1);
-	muu->shadeStr[AIR_STRLEN_MED-1] = 0;
+	muu->shadeStr[AIR_STRLEN_MED - 1] = 0;
 
 	muu->rayStep = 0.01;
 
@@ -112,6 +112,23 @@ int main(int argc, char **argv)
 	airMopAdd(mop, muu->nout, (airMopper) nrrdNuke, airMopAlways);
 
 	muu->hctx->numThreads = 1;
+
+	NrrdKernelSpec* kernelSpec00 = nrrdKernelSpecNew();
+	NrrdKernelSpec* kernelSpec11 = nrrdKernelSpecNew();
+	NrrdKernelSpec* kernelSpec22 = nrrdKernelSpecNew();
+	if (nrrdKernelSpecParse(kernelSpec00, "tent") || nrrdKernelSpecParse(
+			kernelSpec11, "cubicd:1,0") || nrrdKernelSpecParse(kernelSpec22,
+			"cubicdd:1,0"))
+	{
+		airMopAdd(mop, err = biffGetDone(NRRD), airFree, airMopAlways);
+		fprintf(stderr, "%s: trouble parsing kernel:\n%s\n", me, err);
+		airMopError(mop);
+		return 1;
+	}
+
+	muu->ksp[gageKernel00] = kernelSpec00;
+	muu->ksp[gageKernel11] = kernelSpec11;
+	muu->ksp[gageKernel22] = kernelSpec22;
 
 	double v[NRRD_SPACE_DIM_MAX];
 	nrrdSpacingCalculate(nin, 0, &(muu->hctx->volSpacing[0]), v);
