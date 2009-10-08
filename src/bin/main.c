@@ -10,15 +10,11 @@
 #include <teem/mite.h>
 #include <teem/limn.h>
 
-#include <string>
-
-using namespace std;
-
 int main(int argc, char **argv)
 {
 	char *err;
 	char *me = "main";
-	string fileName = "data/A-spgr-deface.nhdr";
+	char* fileName = "data/A-spgr-deface.nhdr";
 
 	// Array to hold stuff to destroy
 	airArray *mop;
@@ -28,11 +24,11 @@ int main(int argc, char **argv)
 	Nrrd* nin = nrrdNew();
 
 	// Load the input nrrd to nin
-	if (nrrdLoad(nin, fileName.c_str(), NULL))
+	if (nrrdLoad(nin, fileName, NULL))
 	{
 		char* err = biffGetDone(NRRD);
 		fprintf(stderr, "%s: trouble reading \"%s\" data:\n%s", me,
-				fileName.c_str(), err);
+				fileName, err);
 		free(err);
 		//precisa nukar o nrrd aqui?
 		return 1;
@@ -46,7 +42,7 @@ int main(int argc, char **argv)
 	{
 		err = biffGetDone(NRRD);
 		fprintf(stderr, "%s: trouble reading \"%s\" data:\n%s", me,
-				fileName.c_str(), err);
+				fileName, err);
 		free(err);
 		//precisa nukar o nrrd aqui?
 		return 1;
