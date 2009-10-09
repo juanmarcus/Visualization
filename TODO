@@ -3,3 +3,4 @@ main.cpp
 	
 CMake
 	- Create a macro or function to list sub directories
+	- Automate linking
