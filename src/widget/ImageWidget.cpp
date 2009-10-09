@@ -1,9 +1,8 @@
 #include "ImageWidget.h"
 
 ImageWidget::ImageWidget(QWidget *parent) :
-	QWidget(parent)
+	QLabel(parent)
 {
-
 }
 
 ImageWidget::~ImageWidget()

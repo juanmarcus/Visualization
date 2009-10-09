@@ -1,9 +1,9 @@
 #ifndef IMAGEWIDGET_H
 #define IMAGEWIDGET_H
 
-#include <QtGui/QWidget>
+#include <QtGui/QLabel>
 
-class ImageWidget: public QWidget
+class ImageWidget: public QLabel
 {
 Q_OBJECT
 

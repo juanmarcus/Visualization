@@ -45,6 +45,7 @@ set(LIBS ${LIBS} ${Teem_LIBRARIES} ${QT_LIBRARIES} ${Boost_LIBRARIES})
 SET (VISIBI_LIBS
     widget
     cmdline
+    error
 )
 
 SET (LIBS ${LIBS} ${VISIBI_LIBS})

@@ -9,7 +9,6 @@ SET (headers
 SET (full_sources
     ${sources}
     ${headers}
-    ${moc_sources}
 )
 
 ADD_LIBRARY(cmdline STATIC ${full_sources})
