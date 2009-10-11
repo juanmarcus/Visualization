@@ -26,7 +26,7 @@ find_package (Boost 1.39.0 COMPONENTS program_options REQUIRED)
 
 # Use files
 include (${Teem_USE_FILE})
-#set(QT_USE_QTOPENGL TRUE)
+set(QT_USE_QTOPENGL TRUE)
 #set(QT_USE_QTXML TRUE)
 include (${QT_USE_FILE})
 
@@ -43,9 +43,9 @@ set(LIBS ${LIBS} ${Teem_LIBRARIES} ${QT_LIBRARIES} ${Boost_LIBRARIES})
 
 # List sub libraries
 SET (VISIBI_LIBS
-    widget
-    cmdline
     error
+    cmdline
+    qtopengl
 )
 
 SET (LIBS ${LIBS} ${VISIBI_LIBS})

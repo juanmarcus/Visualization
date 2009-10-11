@@ -1,7 +1,7 @@
 #include "ImageWidget.h"
 
 ImageWidget::ImageWidget(QWidget *parent) :
-	QLabel(parent)
+	QGLWidget(parent)
 {
 }
 

@@ -19,5 +19,5 @@ SET (full_sources
     ${moc_sources}
 )
 
-ADD_LIBRARY(widget STATIC ${full_sources})
-TARGET_LINK_LIBRARIES (widget ${LIBS})
+ADD_LIBRARY(qtopengl STATIC ${full_sources})
+TARGET_LINK_LIBRARIES (qtopengl ${LIBS})

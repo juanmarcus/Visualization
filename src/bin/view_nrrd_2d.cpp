@@ -10,7 +10,7 @@
 #include <string>
 #include <iostream>
 
-#include "widget/ImageWidget.h"
+#include "qtopengl/ImageWidget.h"
 #include "cmdline/CommandLineParser.h"
 
 #include <teem/nrrd.h>
