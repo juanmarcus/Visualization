@@ -1,11 +1,9 @@
 SET (sources
     ImageWidget.cpp
-    QPixmapFactory.cpp
 )
 
 SET (headers
     ImageWidget.h
-    QPixmapFactory.h
 )
 
 SET (moc_headers

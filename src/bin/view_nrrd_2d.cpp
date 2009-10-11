@@ -11,7 +11,6 @@
 #include <iostream>
 
 #include "widget/ImageWidget.h"
-#include "widget/QPixmapFactory.h"
 #include "cmdline/CommandLineParser.h"
 
 #include <teem/nrrd.h>
@@ -47,12 +46,8 @@ int main(int argc, char **argv)
 
 	// Create an application
 	QApplication app(argc, argv);
-	// Create an pixmap from the nrrd
-	QPixmapFactory pixmapFactory;
-	QPixmap* image = pixmapFactory.createPixmap(nin);
 	// Create a ImageWidget
 	ImageWidget imgw;
-	imgw.setPixmap(*image);
 	// Show the widget
 	imgw.show();
 	// Run the application loop
