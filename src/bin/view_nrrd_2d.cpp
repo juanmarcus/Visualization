@@ -6,12 +6,12 @@
  */
 
 #include <QtGui/QApplication>
+#include <QtGui/QMainWindow>
 
 #include <string>
 #include <iostream>
 
-#include "qtopengl/ImageWidget.h"
-#include "cmdline/CommandLineParser.h"
+#include "ibi_cmdline/CommandLineParser.h"
 
 #include <teem/nrrd.h>
 #include <teem/biff.h>
@@ -47,9 +47,9 @@ int main(int argc, char **argv)
 	// Create an application
 	QApplication app(argc, argv);
 	// Create a ImageWidget
-	ImageWidget imgw;
+	QMainWindow w;
 	// Show the widget
-	imgw.show();
+	w.show();
 	// Run the application loop
 	return app.exec();
 }

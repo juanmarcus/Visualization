@@ -16,39 +16,21 @@ ADD_CUSTOM_TARGET (uninstall
 # Verbose makefile
 SET (CMAKE_VERBOSE_MAKEFILE ON)
 
-# Fix Teem_DIR
-SET (Teem_DIR "/usr/local/lib" CACHE STRING "Directory with TeemConfig.cmake")
-
 #find required packages
+find_package (IBI REQUIRED)
 find_package (Teem REQUIRED)
 find_package (Qt4 REQUIRED)
-find_package (Boost 1.39.0 COMPONENTS program_options REQUIRED)
 
 # Use files
+include (${IBI_USE_FILE})
 include (${Teem_USE_FILE})
 set(QT_USE_QTOPENGL TRUE)
 #set(QT_USE_QTXML TRUE)
 include (${QT_USE_FILE})
 
-# Include directories
-#include_directories(
-#    ${Boost_INCLUDE_DIR}
-#)
-
-#libs
-set(LIBS ${LIBS} ${Teem_LIBRARIES} ${QT_LIBRARIES} ${Boost_LIBRARIES})
-
-#definitions
-#add_definitions(${QGLVIEWER_DEFINITIONS})
-
-# List sub libraries
-SET (VISIBI_LIBS
-    error
-    cmdline
-    qtopengl
-)
-
-SET (LIBS ${LIBS} ${VISIBI_LIBS})
+#-----------------------------------------------------------------------------
+# Configure libraries 
+set(LIBS ${LIBS} ${IBI_LIBRARIES} ${Teem_LIBRARIES} ${QT_LIBRARIES})
 
 # Dispatch the build into source subdirectory
 ADD_SUBDIRECTORY (src)

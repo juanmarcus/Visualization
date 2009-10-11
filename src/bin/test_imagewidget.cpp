@@ -6,17 +6,16 @@
  */
 
 #include <QtGui/QApplication>
-
-#include "qtopengl/ImageWidget.h"
+#include <QtGui/QMainWindow>
 
 int main(int argc, char **argv)
 {
 	// Create an application
 	QApplication app(argc, argv);
 	// Create a ImageWidget
-	ImageWidget imgw;
+	QMainWindow w;
 	// Show the widget
-	imgw.show();
+	w.show();
 	// Run the application loop
 	return app.exec();
 }
