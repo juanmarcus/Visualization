@@ -40,6 +40,7 @@ public:
 	{
 		glClearColor(0.0, 0.0, 0.0, 1.0);
 		textures.resize(nin->axis[axis].size, NULL);
+		range = nrrdRangeNewSet(nin, 0);
 	}
 
 	void paintGL()
@@ -76,9 +77,8 @@ public:
 		{
 			Nrrd* slice = nrrdNew();
 			nrrdSlice(slice, nin, axis, n);
-			NrrdRange* range = nrrdRangeNewSet(slice, 0);
 			Nrrd* qslice = nrrdNew();
-			nrrdQuantize(qslice,slice,range,16);
+			nrrdQuantize(qslice, slice, range, 16);
 			Texture* t = new Texture(FF_NRRD);
 			t->setData(qslice->data);
 			t->setDims(qslice->axis[0].size, qslice->axis[1].size);
@@ -117,6 +117,7 @@ private:
 	int currentSlice;
 	TextureLoader loader;
 	GLMode2D mode2d;
+	NrrdRange* range;
 public:
 	Nrrd* nin;
 	unsigned int axis;
