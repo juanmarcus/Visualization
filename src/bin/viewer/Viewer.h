@@ -13,6 +13,7 @@ public:
 	Viewer(QWidget *parent = 0);
 	~Viewer();
 
+	void init();
 	void draw();
 private:
 	GeometryDrawer drawer;
