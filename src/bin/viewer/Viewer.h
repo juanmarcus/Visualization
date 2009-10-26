@@ -2,6 +2,8 @@
 #define VIEWER_H
 
 #include <QGLViewer/qglviewer.h>
+#include "ibi_geometry/Ray.h"
+#include "ibi_gl/GeometryDrawer.h"
 
 class Viewer: public QGLViewer
 {
@@ -12,6 +14,9 @@ public:
 	~Viewer();
 
 	void draw();
+private:
+	GeometryDrawer drawer;
+	Ray ray;
 };
 
 #endif // VIEWER_H
