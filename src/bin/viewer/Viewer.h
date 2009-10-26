@@ -11,6 +11,7 @@ public:
 	Viewer(QWidget *parent = 0);
 	~Viewer();
 
+	void draw();
 };
 
 #endif // VIEWER_H
