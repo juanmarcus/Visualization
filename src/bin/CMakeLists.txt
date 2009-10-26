@@ -15,3 +15,12 @@ FOREACH (cpp_source ${cpp_sources})
     add_executable (${target} ${cpp_source})
     target_link_libraries (${target} ${LIBS})
 ENDFOREACH (cpp_source)
+
+SET (folders
+    "viewer"
+)
+
+# Parse each subdirectory
+FOREACH (folder ${folders})
+    ADD_SUBDIRECTORY (${folder})
+ENDFOREACH (folder ${folders})
