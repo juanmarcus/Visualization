@@ -47,6 +47,8 @@ void Viewer::draw()
 	Matrix4 m(mod[0], mod[4], mod[8], mod[12], mod[1], mod[5], mod[9], mod[13],
 			mod[2], mod[6], mod[10], mod[14], mod[3], mod[7], mod[11], mod[15]);
 
+	glDisable(GL_TEXTURE_2D);
+
 	glColor3f(1.0, 1.0, 1.0);
 
 	// Transform ray
@@ -77,14 +79,92 @@ void Viewer::draw()
 		std::vector<Vector3> ipoints = Interpolation::interpolate(intpoint1,
 				intpoint2, 100);
 		drawer.drawPoints(ipoints);
-	}
 
-	// Test sample
-	double value = sampler.sample(150, 100, 125);
-	std::cout << "Sampling: " << value << std::endl;
-	std::cout << "Real Value: " << nrrdUILookup[nin->type](nin->data, 150
-			+ (100 * nin->axis[0].size) + (125 * nin->axis[0].size
-			* nin->axis[1].size)) << std::endl;
+		// Calculate size
+		int size = ipoints.size();
+
+		// reserve memory space
+		double* data = new double[size];
+
+		// sample points and save to memory
+		for (int i = 0; i < size; ++i)
+		{
+			// Get point
+			Vector3 point = ipoints[i];
+
+			// Calculate position on dataset
+			double ix, iy, iz;
+
+			ix = ((point.x + 1.0) / 2.0) * 500.0;
+			iy = ((point.y + 1.0) / 2.0) * 500.0;
+			iz = ((point.z + 1.0) / 2.0) * 240.0;
+
+			// Sample
+			double value = sampler.sample(ix, iy, iz);
+
+			// Set sampled value in memory area
+			data[i] = value;
+		}
+		Nrrd* wr = nrrdNew();
+		if (nrrdWrap_va(wr, data, nrrdTypeDouble, 1, size))
+		{
+			char * err = biffGetDone(NRRD);
+			throw Exception(err);
+		}
+
+		// Determine value range
+		NrrdRange* range = nrrdRangeNewSet(wr, 0);
+
+		// Make historgram
+		Nrrd* dhist = nrrdNew();
+		if (nrrdHistoDraw(dhist, wr, 50, 1, range->max))
+		{
+			char * err = biffGetDone(NRRD);
+			throw Exception(err);
+		}
+
+		// Destroy range
+		nrrdRangeNix(range);
+
+		// Create a texture from the histogram
+		Texture t(FF_NRRD);
+		t.setData(dhist->data);
+		t.setDims(dhist->axis[0].size, dhist->axis[1].size);
+		t.setDataFormat(GL_UNSIGNED_BYTE);
+
+		loader.load(t);
+
+		// Show texture
+		mode2d.enable();
+
+		t.apply();
+
+		glColor3d(1.0, 1.0, 1.0);
+
+		glBegin(GL_QUADS);
+
+		glTexCoord2d(0.0, 0.0);
+		glVertex2d(0.8, 0.8);
+
+		glTexCoord2d(1.0, 0.0);
+		glVertex2d(1.0, 0.8);
+
+		glTexCoord2d(1.0, 1.0);
+		glVertex2d(1.0, 1.0);
+
+		glTexCoord2d(0.0, 1.0);
+		glVertex2d(0.8, 1.0);
+
+		glEnd();
+
+		mode2d.disable();
+
+		// Free data
+		nrrdNuke(dhist);
+		nrrdNix(wr);
+		delete[] data;
+
+	}
 
 }
 

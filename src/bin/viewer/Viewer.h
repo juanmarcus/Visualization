@@ -3,8 +3,10 @@
 
 #include <QGLViewer/qglviewer.h>
 #include "ibi_geometry/Ray.h"
+#include "ibi_gl2d/GLMode2D.h"
 #include "ibi_gl/GeometryDrawer.h"
 #include "ibi_geometry/AxisAlignedBox.h"
+#include "ibi_qt/TextureLoader.h"
 #include "Sampler.h"
 
 class Viewer: public QGLViewer
@@ -18,8 +20,10 @@ public:
 	void init();
 	void draw();
 private:
-	// Geometry drawer
+	// drawing
 	GeometryDrawer drawer;
+	TextureLoader loader;
+	GLMode2D mode2d;
 
 	// Objects
 	Ray ray;
