@@ -71,7 +71,7 @@ public:
 	{
 		if (textures[n] != NULL)
 		{
-			textures[n]->apply();
+			textures[n]->enable();
 		}
 		else
 		{
@@ -85,7 +85,7 @@ public:
 			t->setDataFormat(GL_UNSIGNED_SHORT);
 			loader.load(*t);
 			textures[n] = t;
-			t->apply();
+			t->enable();
 			nrrdNuke(slice);
 			nrrdNuke(qslice);
 		}

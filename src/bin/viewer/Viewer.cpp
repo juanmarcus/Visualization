@@ -137,7 +137,7 @@ void Viewer::draw()
 		// Show texture
 		mode2d.enable();
 
-		t.apply();
+		t.enable();
 
 		glColor3d(1.0, 1.0, 1.0);
 
