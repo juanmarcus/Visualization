@@ -27,6 +27,18 @@ void Viewer::init()
 
 	box.setExtents(-1, -1, -1, 1, 1, 1);
 	//	restoreStateFromFile();
+
+	nin = nrrdNew();
+	if (nrrdLoad(nin, "data/A-spgr-deface.nhdr", NULL))
+	{
+		char* err = biffGetDone(NRRD);
+		std::cerr << err << std::endl;
+		free(err);
+		nrrdNuke(nin);
+	}
+
+	sampler.setNrrd(nin);
+	sampler.update();
 }
 
 void Viewer::draw()
@@ -35,7 +47,7 @@ void Viewer::draw()
 	Matrix4 m(mod[0], mod[4], mod[8], mod[12], mod[1], mod[5], mod[9], mod[13],
 			mod[2], mod[6], mod[10], mod[14], mod[3], mod[7], mod[11], mod[15]);
 
-	glColor3f(1.0,1.0,1.0);
+	glColor3f(1.0, 1.0, 1.0);
 
 	// Transform ray
 	Ray tray = Transform::TransformRay(m, ray);
@@ -66,6 +78,13 @@ void Viewer::draw()
 				intpoint2, 100);
 		drawer.drawPoints(ipoints);
 	}
+
+	// Test sample
+	double value = sampler.sample(150, 100, 125);
+	std::cout << "Sampling: " << value << std::endl;
+	std::cout << "Real Value: " << nrrdUILookup[nin->type](nin->data, 150
+			+ (100 * nin->axis[0].size) + (125 * nin->axis[0].size
+			* nin->axis[1].size)) << std::endl;
 
 }
 

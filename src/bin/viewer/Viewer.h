@@ -5,6 +5,7 @@
 #include "ibi_geometry/Ray.h"
 #include "ibi_gl/GeometryDrawer.h"
 #include "ibi_geometry/AxisAlignedBox.h"
+#include "Sampler.h"
 
 class Viewer: public QGLViewer
 {
@@ -17,9 +18,18 @@ public:
 	void init();
 	void draw();
 private:
+	// Geometry drawer
 	GeometryDrawer drawer;
+
+	// Objects
 	Ray ray;
 	AxisAlignedBox box;
+
+	// Sampler to query values from a nrrd
+	Sampler sampler;
+
+	// Dataset
+	Nrrd* nin;
 };
 
 #endif // VIEWER_H
