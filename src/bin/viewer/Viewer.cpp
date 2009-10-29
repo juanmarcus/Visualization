@@ -1,5 +1,10 @@
 #include "Viewer.h"
 
+#include "ibi_geometry/Transform.h"
+#include "ibi_geometry/Matrix4.h"
+#include "ibi_geometry/Intersection.h"
+#include "ibi_interpolation/Interpolation.h"
+
 using namespace qglviewer;
 
 Viewer::Viewer(QWidget *parent) :
@@ -18,19 +23,49 @@ void Viewer::init()
 	setManipulatedFrame(new ManipulatedFrame());
 
 	setSceneRadius(2.0);
+	showEntireScene();
 
-//	restoreStateFromFile();
+	box.setExtents(-1, -1, -1, 1, 1, 1);
+	//	restoreStateFromFile();
 }
 
 void Viewer::draw()
 {
-	// Change to frame coordinate system
-	glPushMatrix();
-	glMultMatrixd(manipulatedFrame()->matrix());
+	const GLdouble* mod = manipulatedFrame()->matrix();
+	Matrix4 m(mod[0], mod[4], mod[8], mod[12], mod[1], mod[5], mod[9], mod[13],
+			mod[2], mod[6], mod[10], mod[14], mod[3], mod[7], mod[11], mod[15]);
+
+	glColor3f(1.0,1.0,1.0);
+
+	// Transform ray
+	Ray tray = Transform::TransformRay(m, ray);
 	// Draw ray
-	drawer.draw(ray, 2, 0.005);
-	// Change back to world coordinate system
-	glPopMatrix();
+	drawer.drawRay(tray, 4, 0.005);
+
+	// Draw point at the origin
+	drawer.drawPoint(Vector3::ZERO);
+
+	// Draw a box
+	drawer.drawAxisAlignedBox(box);
+
+	// Calculate ray box intersections and interpolate
+	std::pair<bool, RealPair> result = Intersection::intersects(tray, box);
+	if (result.first)
+	{
+		Real d1 = result.second.first;
+		Real d2 = result.second.second;
+		Vector3 intpoint1 = tray * d1;
+		Vector3 intpoint2 = tray * d2;
+		glColor3f(1.0, 0.0, 0.0);
+		drawer.drawPoint(intpoint1);
+		drawer.drawPoint(intpoint2);
+
+		// Draw interpolation points
+		glColor3f(0.0, 0.0, 1.0);
+		std::vector<Vector3> ipoints = Interpolation::interpolate(intpoint1,
+				intpoint2, 100);
+		drawer.drawPoints(ipoints);
+	}
 
 }
 

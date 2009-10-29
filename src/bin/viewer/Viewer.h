@@ -4,6 +4,7 @@
 #include <QGLViewer/qglviewer.h>
 #include "ibi_geometry/Ray.h"
 #include "ibi_gl/GeometryDrawer.h"
+#include "ibi_geometry/AxisAlignedBox.h"
 
 class Viewer: public QGLViewer
 {
@@ -18,6 +19,7 @@ public:
 private:
 	GeometryDrawer drawer;
 	Ray ray;
+	AxisAlignedBox box;
 };
 
 #endif // VIEWER_H
