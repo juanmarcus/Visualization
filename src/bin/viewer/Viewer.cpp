@@ -129,6 +129,7 @@ void Viewer::draw()
 		// Create a texture from the histogram
 		Texture t(FF_NRRD);
 		t.setData(dhist->data);
+		t.setElemSize(nrrdElementSize(dhist));
 		t.setDims(dhist->axis[0].size, dhist->axis[1].size);
 		t.setDataFormat(GL_UNSIGNED_BYTE);
 

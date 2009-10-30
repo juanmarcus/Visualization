@@ -79,8 +79,10 @@ public:
 			nrrdSlice(slice, nin, axis, n);
 			Nrrd* qslice = nrrdNew();
 			nrrdQuantize(qslice, slice, range, 16);
+			int elemsize = nrrdElementSize(qslice);
 			Texture* t = new Texture(FF_NRRD);
 			t->setData(qslice->data);
+			t->setElemSize(elemsize);
 			t->setDims(qslice->axis[0].size, qslice->axis[1].size);
 			t->setDataFormat(GL_UNSIGNED_SHORT);
 			loader.load(*t);
