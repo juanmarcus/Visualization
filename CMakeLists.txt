@@ -25,6 +25,8 @@ find_package (IBI REQUIRED)
 find_package (Teem REQUIRED)
 find_package (Qt4 REQUIRED)
 find_package (QGLViewer REQUIRED)
+find_package (GLEW REQUIRED)
+find_package (Cg REQUIRED)
 
 #-----------------------------------------------------------------------------
 # Use files
@@ -38,6 +40,8 @@ include (${QT_USE_FILE})
 # Include directories
 INCLUDE_DIRECTORIES (
     ${QGLVIEWER_INCLUDE_DIR}
+    ${CG_INCLUDE_PATH}
+    ${GLEW_INCLUDE_PATH}
 )
 
 #-----------------------------------------------------------------------------
@@ -48,7 +52,7 @@ ADD_DEFINITIONS(
 
 #-----------------------------------------------------------------------------
 # Configure libraries 
-set(LIBS ${LIBS} ${IBI_LIBRARIES} ${Teem_LIBRARIES} ${QT_LIBRARIES} ${QGLVIEWER_LIBRARY})
+set(LIBS ${LIBS} ${IBI_LIBRARIES} ${Teem_LIBRARIES} ${QT_LIBRARIES} ${QGLVIEWER_LIBRARY} ${CG_LIBRARY} ${CG_GL_LIBRARY} ${GLEW_LIBRARY})
 
 #-----------------------------------------------------------------------------
 # Dispatch the build into source subdirectory
