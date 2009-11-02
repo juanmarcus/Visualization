@@ -7,6 +7,8 @@
 
 #include "Sampler.h"
 
+using namespace ibi;
+
 Sampler::Sampler()
 {
 	ctx = 0;

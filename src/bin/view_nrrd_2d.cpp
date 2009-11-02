@@ -13,22 +13,24 @@
 #include <iostream>
 #include <vector>
 
+#include "ibi_qt/ibiQGLViewer.h"
 #include "ibi_cmdline/CommandLineParser.h"
-#include "ibi_qt/ibiQtFunctorGLWidget.h"
 #include "ibi_error/Exception.h"
-#include "ibi_gl2d/GLMode2D.h"
+//#include "ibi_gl/GLMode2D.h"
+#include "ibi_gl/Texture.h"
+#include "ibi_texturemanager/TextureManager.h"
 
 #include <teem/nrrd.h>
 
 using namespace std;
+using namespace ibi;
 
-class GLWidget: public ibiQtSmartGLWidget
+class GLWidget: public ibiQGLViewer
 {
 public:
 	GLWidget() :
-		ibiQtSmartGLWidget()
+		ibiQGLViewer()
 	{
-		setViewportAuto(true);
 		currentSlice = 0;
 	}
 	~GLWidget()
@@ -41,6 +43,9 @@ public:
 		glClearColor(0.0, 0.0, 0.0, 1.0);
 		textures.resize(nin->axis[axis].size, NULL);
 		range = nrrdRangeNewSet(nin, 0);
+
+		textureManager.loadPlugin("../ibi/build/lib/libtexture_loader_nrrd.so");
+		nrrdTextureLoader = textureManager.getLoader("nrrd");
 	}
 
 	void paintGL()
@@ -77,19 +82,18 @@ public:
 		{
 			Nrrd* slice = nrrdNew();
 			nrrdSlice(slice, nin, axis, n);
-			Nrrd* qslice = nrrdNew();
-			nrrdQuantize(qslice, slice, range, 16);
-			int elemsize = nrrdElementSize(qslice);
-			Texture* t = new Texture(FF_NRRD);
-			t->setData(qslice->data);
-			t->setElemSize(elemsize);
-			t->setDims(qslice->axis[0].size, qslice->axis[1].size);
-			t->setDataFormat(GL_UNSIGNED_SHORT);
-			loader.load(*t);
+
+			TextureLoadingInfo info;
+			info.texture_type = "nrrd";
+			info.target = GL_TEXTURE_2D;
+			info.options["nrrd"] = slice;
+
+			Texture* t = nrrdTextureLoader->load(info);
+
 			textures[n] = t;
+
 			t->enable();
 			nrrdNuke(slice);
-			nrrdNuke(qslice);
 		}
 	}
 
@@ -117,8 +121,9 @@ public:
 private:
 	vector<Texture*> textures;
 	int currentSlice;
-	TextureLoader loader;
-	GLMode2D mode2d;
+	TextureManager textureManager;
+	TextureLoader* nrrdTextureLoader;
+	//	GLMode2D mode2d;
 	NrrdRange* range;
 public:
 	Nrrd* nin;

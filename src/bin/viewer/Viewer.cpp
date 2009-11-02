@@ -2,6 +2,7 @@
 
 #include "ibi_geometry/Transform.h"
 #include "ibi_geometry/Matrix4.h"
+#include "ibi_gl/Texture.h"
 #include "ibi_geometry/Intersection.h"
 #include "ibi_interpolation/Interpolation.h"
 
@@ -10,7 +11,6 @@ using namespace qglviewer;
 Viewer::Viewer(QWidget *parent) :
 	QGLViewer(parent)
 {
-
 }
 
 Viewer::~Viewer()
@@ -39,6 +39,9 @@ void Viewer::init()
 
 	sampler.setNrrd(nin);
 	sampler.update();
+
+	textureManager.loadPlugin("../ibi/build/lib/libtexture_loader_nrrd.so");
+	loader = textureManager.getLoader("nrrd");
 }
 
 void Viewer::draw()
@@ -127,18 +130,15 @@ void Viewer::draw()
 		nrrdRangeNix(range);
 
 		// Create a texture from the histogram
-		Texture t(FF_NRRD);
-		t.setData(dhist->data);
-		t.setElemSize(nrrdElementSize(dhist));
-		t.setDims(dhist->axis[0].size, dhist->axis[1].size);
-		t.setDataFormat(GL_UNSIGNED_BYTE);
-
-		loader.load(t);
+		TextureLoadingInfo info;
+		info.target = GL_TEXTURE_2D;
+		info.options["nrrd"] = dhist;
+		Texture* t = loader->load(info);
 
 		// Show texture
 		mode2d.enable();
 
-		t.enable();
+		t->enable();
 
 		glColor3d(1.0, 1.0, 1.0);
 
@@ -164,6 +164,7 @@ void Viewer::draw()
 		nrrdNuke(dhist);
 		nrrdNix(wr);
 		delete[] data;
+		delete t;
 
 	}
 

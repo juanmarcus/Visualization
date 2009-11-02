@@ -12,6 +12,8 @@
 #include <teem/gage.h>
 #include "ibi_error/Exception.h"
 
+using namespace ibi;
+
 class Sampler
 {
 public:
