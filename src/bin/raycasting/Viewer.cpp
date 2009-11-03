@@ -115,6 +115,7 @@ Viewer::Viewer(QWidget *parent) :
 {
 	toggle_visuals = true;
 	stepsize = 1.0 / 50.0;
+	resize(WINDOW_SIZE, WINDOW_SIZE);
 }
 
 Viewer::~Viewer()
@@ -260,6 +261,8 @@ void Viewer::init()
 	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
 			GL_RENDERBUFFER_EXT, renderbuffer);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+	glDisable(GL_LIGHTING);
 
 }
 
