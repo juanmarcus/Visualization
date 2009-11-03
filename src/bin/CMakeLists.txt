@@ -19,7 +19,6 @@ ENDFOREACH (cpp_source)
 SET (folders
     "query_ray"
     "raycasting"
-    "tutorial"
 )
 
 # Parse each subdirectory

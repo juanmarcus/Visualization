@@ -43,14 +43,14 @@ public:
 
 	// Texture control
 	void create_volumetexture();
-	void set_tex_param(char* par, GLuint tex, const CGprogram &program,
-			CGparameter param);
 
-	// Load shaders
+	// Shader control
 	void load_vertex_program(CGprogram &v_program, char *shader_path,
 			char *program_name);
 	void load_fragment_program(CGprogram &f_program, char *shader_path,
 			char *program_name);
+	void set_tex_param(char* par, GLuint tex, const CGprogram &program,
+			CGparameter param);
 
 	// the volume texture
 	GLuint volume_texture;
