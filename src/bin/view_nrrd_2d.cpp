@@ -25,20 +25,20 @@
 using namespace std;
 using namespace ibi;
 
-class GLWidget: public ibiQGLViewer
+class Viewer: public ibiQGLViewer
 {
 public:
-	GLWidget() :
+	Viewer() :
 		ibiQGLViewer()
 	{
 		currentSlice = 0;
 	}
-	~GLWidget()
+	~Viewer()
 	{
 
 	}
 
-	void initializeGL()
+	void init()
 	{
 		glClearColor(0.0, 0.0, 0.0, 1.0);
 		textures.resize(nin->axis[axis].size, NULL);
@@ -46,30 +46,37 @@ public:
 
 		textureManager.loadPlugin("../ibi/build/lib/libtexture_loader_nrrd.so");
 		nrrdTextureLoader = textureManager.getLoader("nrrd");
+
+		setDesiredAspectRatio(1.0);
 	}
 
-	void paintGL()
+	void draw()
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		//		mode2d.enable();
-
 		makeSlice(currentSlice);
+
+		start2DMode();
+
+		glColor3d(1.0, 1.0, 1.0);
 
 		glBegin(GL_QUADS);
 
 		glTexCoord2d(0.0, 0.0);
-		glVertex2d(-1.0, -1.0);
+		glVertex2d(0.0, 0.0);
+
 		glTexCoord2d(1.0, 0.0);
-		glVertex2d(+1.0, -1.0);
+		glVertex2d(1.0, 0.0);
+
 		glTexCoord2d(1.0, 1.0);
-		glVertex2d(+1.0, +1.0);
+		glVertex2d(1.0, 1.0);
+
 		glTexCoord2d(0.0, 1.0);
-		glVertex2d(-1.0, +1.0);
+		glVertex2d(0.0, 1.0);
 
 		glEnd();
 
-		//		mode2d.disable();
+		stop2DMode();
 	}
 
 	void makeSlice(unsigned int n)
@@ -166,7 +173,7 @@ int main(int argc, char **argv)
 	// Create an application
 	QApplication app(argc, argv);
 	// Create a ImageWidget
-	GLWidget w;
+	Viewer w;
 	// Set parameters
 	w.nin = nin;
 	w.axis = axis;
