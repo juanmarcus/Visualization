@@ -89,11 +89,13 @@ public:
 		{
 			Nrrd* slice = nrrdNew();
 			nrrdSlice(slice, nin, axis, n);
+			Nrrd* nout = nrrdNew();
+			nrrdQuantize(nout,slice,range,8);
 
 			TextureLoadingInfo info;
 			info.texture_type = "nrrd";
 			info.target = GL_TEXTURE_2D;
-			info.options["nrrd"] = slice;
+			info.options["nrrd"] = nout;
 
 			Texture* t = nrrdTextureLoader->load(info);
 
