@@ -1,6 +1,7 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
+#include "ibi_gl/ibi_gl.h"
 #include <QGLViewer/qglviewer.h>
 #include "ibi_geometry/Ray.h"
 #include "ibi_gl/GLMode2D.h"

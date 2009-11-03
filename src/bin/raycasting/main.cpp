@@ -5,8 +5,8 @@
  *      Author: Juan Ibiapina
  */
 
+#include "ibi_gl/ibi_gl.h"
 #include <QtGui/QApplication>
-
 #include "Viewer.h"
 
 int main(int argc, char **argv)
