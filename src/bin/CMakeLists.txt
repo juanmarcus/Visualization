@@ -17,8 +17,9 @@ FOREACH (cpp_source ${cpp_sources})
 ENDFOREACH (cpp_source)
 
 SET (folders
-    "viewer"
+    "query_ray"
     "raycasting"
+    "tutorial"
 )
 
 # Parse each subdirectory

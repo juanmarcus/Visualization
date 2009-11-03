@@ -14,5 +14,5 @@ SET (full_sources
     ${moc_sources}
 )
 
-ADD_EXECUTABLE (viewer ${full_sources})
-TARGET_LINK_LIBRARIES (viewer ${LIBS})
+ADD_EXECUTABLE (query_ray ${full_sources})
+TARGET_LINK_LIBRARIES (query_ray ${LIBS})

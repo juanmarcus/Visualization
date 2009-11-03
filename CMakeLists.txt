@@ -26,6 +26,7 @@ find_package (Teem REQUIRED)
 find_package (Qt4 REQUIRED)
 find_package (QGLViewer REQUIRED)
 find_package (GLEW REQUIRED)
+find_package (GLUT REQUIRED)
 find_package (Cg REQUIRED)
 
 #-----------------------------------------------------------------------------
@@ -42,6 +43,7 @@ INCLUDE_DIRECTORIES (
     ${QGLVIEWER_INCLUDE_DIR}
     ${CG_INCLUDE_PATH}
     ${GLEW_INCLUDE_PATH}
+    ${GLUT_INCLUDE_DIR}
 )
 
 #-----------------------------------------------------------------------------
@@ -52,7 +54,7 @@ ADD_DEFINITIONS(
 
 #-----------------------------------------------------------------------------
 # Configure libraries 
-set(LIBS ${LIBS} ${IBI_LIBRARIES} ${Teem_LIBRARIES} ${QT_LIBRARIES} ${QGLVIEWER_LIBRARY} ${CG_LIBRARY} ${CG_GL_LIBRARY} ${GLEW_LIBRARY})
+set(LIBS ${LIBS} ${IBI_LIBRARIES} ${Teem_LIBRARIES} ${QT_LIBRARIES} ${QGLVIEWER_LIBRARY} ${CG_LIBRARY} ${CG_GL_LIBRARY} ${GLEW_LIBRARY} ${GLUT_LIBRARIES})
 
 #-----------------------------------------------------------------------------
 # Dispatch the build into source subdirectory
