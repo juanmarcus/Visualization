@@ -5,6 +5,8 @@
 #include "Cg/cg.h"
 #include "Cg/cgGL.h"
 #include "ibi_qt/ibiQGLViewer.h"
+#include "ibi_gl/Texture.h"
+#include "ibi_texturemanager/TextureManager.h"
 
 using namespace ibi;
 
@@ -52,9 +54,6 @@ public:
 	void set_tex_param(char* par, GLuint tex, const CGprogram &program,
 			CGparameter param);
 
-	// the volume texture
-	GLuint volume_texture;
-
 	// CG stuff
 	CGcontext context;
 	CGprofile vertexProfile, fragmentProfile;
@@ -68,10 +67,15 @@ public:
 	// the buffer textures
 	GLuint backface_buffer; // the FBO buffers
 	GLuint final_image;
+	GLuint volume_texture;
 
 	//rendering parameter
 	float stepsize;
 	bool toggle_visuals;
+
+	//--------------------------------
+	TextureManager manager;
+	Texture* volume;
 };
 
 #endif // VIEWER_H

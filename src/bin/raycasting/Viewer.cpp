@@ -10,27 +10,23 @@ using namespace ibi;
 // create a test volume texture, here you could load your own volume
 void Viewer::create_volumetexture()
 {
+	manager.loadPlugin("../ibi/build/lib/libtexture_loader_nrrd3D.so");
+
 	Nrrd* nin = nrrdNew();
 	if (nrrdLoad(nin, "data/A-spgr-deface.nhdr", NULL))
 	{
 		char* err = biffGetDone(NRRD);
 		cerr << err << endl;
 	}
-	int width = nin->axis[0].size;
-	int height = nin->axis[1].size;
-	int depth = nin->axis[2].size;
 
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glGenTextures(1, &volume_texture);
-	glBindTexture(GL_TEXTURE_3D, volume_texture);
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
-	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, width, height, depth, 0, GL_LUMINANCE,
-			GL_UNSIGNED_SHORT, nin->data);
+	TextureLoadingInfo info;
+	info.target = GL_TEXTURE_3D;
+	info.texture_type = "nrrd3D";
+	info.options["nrrd"] = nin;
+
+	volume = manager.load(info);
+
+	volume->disable();
 
 	cout << "volume texture created" << endl;
 
@@ -303,7 +299,7 @@ void Viewer::raycasting_pass()
 	cgGLBindProgram(fragment_main);
 	cgGLSetParameter1f(cgGetNamedParameter(fragment_main, "stepsize"), stepsize);
 	set_tex_param("tex", backface_buffer, fragment_main, param1);
-	set_tex_param("volume_tex", volume_texture, fragment_main, param2);
+	set_tex_param("volume_tex", volume->getGLName(), fragment_main, param2);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	drawQuads(1.0, 1.0, 1.0);
