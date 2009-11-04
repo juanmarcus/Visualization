@@ -1,6 +1,7 @@
 #include "Viewer.h"
 
 #include "ibi_geometry/Vector3.h"
+#include <teem/nrrd.h>
 #include <iostream>
 
 using namespace std;
@@ -9,89 +10,15 @@ using namespace ibi;
 // create a test volume texture, here you could load your own volume
 void Viewer::create_volumetexture()
 {
-	int size = VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4;
-	GLubyte *data = new GLubyte[size];
-
-	for (int x = 0; x < VOLUME_TEX_SIZE; x++)
+	Nrrd* nin = nrrdNew();
+	if (nrrdLoad(nin, "data/A-spgr-deface.nhdr", NULL))
 	{
-		for (int y = 0; y < VOLUME_TEX_SIZE; y++)
-		{
-			for (int z = 0; z < VOLUME_TEX_SIZE; z++)
-			{
-				data[(x * 4) + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE
-						* VOLUME_TEX_SIZE * 4)] = z % 250;
-				data[(x * 4) + 1 + (y * VOLUME_TEX_SIZE * 4) + (z
-						* VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = y % 250;
-				data[(x * 4) + 2 + (y * VOLUME_TEX_SIZE * 4) + (z
-						* VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 250;
-				data[(x * 4) + 3 + (y * VOLUME_TEX_SIZE * 4) + (z
-						* VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 230;
-
-				Vector3 p = Vector3(x, y, z) - Vector3(VOLUME_TEX_SIZE - 20,
-						VOLUME_TEX_SIZE - 30, VOLUME_TEX_SIZE - 30);
-				bool test = (p.length() < 42);
-				if (test)
-					data[(x * 4) + 3 + (y * VOLUME_TEX_SIZE * 4) + (z
-							* VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 0;
-
-				p = Vector3(x, y, z) - Vector3(VOLUME_TEX_SIZE / 2,
-						VOLUME_TEX_SIZE / 2, VOLUME_TEX_SIZE / 2);
-				test = (p.length() < 24);
-				if (test)
-					data[(x * 4) + 3 + (y * VOLUME_TEX_SIZE * 4) + (z
-							* VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 0;
-
-				if (x > 20 && x < 40 && y > 0 && y < VOLUME_TEX_SIZE && z > 10
-						&& z < 50)
-				{
-
-					data[(x * 4) + (y * VOLUME_TEX_SIZE * 4) + (z
-							* VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 100;
-					data[(x * 4) + 1 + (y * VOLUME_TEX_SIZE * 4) + (z
-							* VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 250;
-					data[(x * 4) + 2 + (y * VOLUME_TEX_SIZE * 4) + (z
-							* VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = y % 100;
-					data[(x * 4) + 3 + (y * VOLUME_TEX_SIZE * 4) + (z
-							* VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 250;
-				}
-
-				if (x > 50 && x < 70 && y > 0 && y < VOLUME_TEX_SIZE && z > 10
-						&& z < 50)
-				{
-
-					data[(x * 4) + (y * VOLUME_TEX_SIZE * 4) + (z
-							* VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 250;
-					data[(x * 4) + 1 + (y * VOLUME_TEX_SIZE * 4) + (z
-							* VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 250;
-					data[(x * 4) + 2 + (y * VOLUME_TEX_SIZE * 4) + (z
-							* VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = y % 100;
-					data[(x * 4) + 3 + (y * VOLUME_TEX_SIZE * 4) + (z
-							* VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 250;
-				}
-
-				if (x > 80 && x < 100 && y > 0 && y < VOLUME_TEX_SIZE && z > 10
-						&& z < 50)
-				{
-
-					data[(x * 4) + (y * VOLUME_TEX_SIZE * 4) + (z
-							* VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 250;
-					data[(x * 4) + 1 + (y * VOLUME_TEX_SIZE * 4) + (z
-							* VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 70;
-					data[(x * 4) + 2 + (y * VOLUME_TEX_SIZE * 4) + (z
-							* VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = y % 100;
-					data[(x * 4) + 3 + (y * VOLUME_TEX_SIZE * 4) + (z
-							* VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 250;
-				}
-
-				p = Vector3(x, y, z) - Vector3(24, 24, 24);
-				test = (p.length() < 40);
-				if (test)
-					data[(x * 4) + 3 + (y * VOLUME_TEX_SIZE * 4) + (z
-							* VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 0;
-
-			}
-		}
+		char* err = biffGetDone(NRRD);
+		cerr << err << endl;
 	}
+	int width = nin->axis[0].size;
+	int height = nin->axis[1].size;
+	int depth = nin->axis[2].size;
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glGenTextures(1, &volume_texture);
@@ -102,10 +29,9 @@ void Viewer::create_volumetexture()
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
-	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, VOLUME_TEX_SIZE, VOLUME_TEX_SIZE,
-			VOLUME_TEX_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, width, height, depth, 0, GL_LUMINANCE,
+			GL_UNSIGNED_SHORT, nin->data);
 
-	delete[] data;
 	cout << "volume texture created" << endl;
 
 }
@@ -402,11 +328,11 @@ void Viewer::draw_fullscreen_quad()
 	glDisable(GL_DEPTH_TEST);
 	glBegin(GL_QUADS);
 
-	glTexCoord2f(0,0);
-	glVertex2f(0,0);
+	glTexCoord2f(0, 0);
+	glVertex2f(0, 0);
 
-	glTexCoord2f(1,0);
-	glVertex2f(1,0);
+	glTexCoord2f(1, 0);
+	glVertex2f(1, 0);
 
 	glTexCoord2f(1, 1);
 
