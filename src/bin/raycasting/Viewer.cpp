@@ -14,7 +14,7 @@ void Viewer::create_volumetexture()
 	textureManager.loadPlugin("../ibi/build/lib/libtexture_loader_empty.so");
 
 	Nrrd* nin = nrrdNew();
-	if (nrrdLoad(nin, "data/A-spgr-deface.nhdr", NULL))
+	if (nrrdLoad(nin, "data/A-spgr-deface_quant.nhdr", NULL))
 	{
 		char* err = biffGetDone(NRRD);
 		cerr << err << endl;
@@ -28,6 +28,8 @@ void Viewer::create_volumetexture()
 	volume = textureManager.load(info);
 
 	volume->disable();
+
+	nrrdNuke(nin);
 
 	cout << "volume texture created" << endl;
 
