@@ -133,13 +133,6 @@ void Viewer::init()
 	// deactivate framebuffer
 	framebuffer.disable();
 
-	FB_status status = framebuffer.getStatus();
-
-	if (status != FB_COMPLETE)
-	{
-		assert(0);
-	}
-
 	glDisable(GL_LIGHTING);
 
 	setSceneRadius(0.65);
@@ -209,12 +202,7 @@ void Viewer::render_backface()
 {
 	// draw to backface
 	framebuffer.setTarget(backface);
-
-	int vPort[4];
-
-	glGetIntegerv(GL_VIEWPORT, vPort);
-
-	glViewport(0, 0, backface->getWidth(), backface->getHeight());
+	framebuffer.beginRender();
 
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -223,19 +211,14 @@ void Viewer::render_backface()
 	drawQuads(1.0, 1.0, 1.0);
 	glDisable(GL_CULL_FACE);
 
-	glViewport(vPort[0], vPort[1], vPort[2], vPort[3]);
+	framebuffer.endRender();
 }
 
 void Viewer::raycasting_pass()
 {
 	// Draw to final image
 	framebuffer.setTarget(final_image);
-
-	int vPort[4];
-
-	glGetIntegerv(GL_VIEWPORT, vPort);
-
-	glViewport(0, 0, final_image->getWidth(), final_image->getHeight());
+	framebuffer.beginRender();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -255,7 +238,7 @@ void Viewer::raycasting_pass()
 	vertexProgram->disable();
 	fragmentProgram->disable();
 
-	glViewport(vPort[0], vPort[1], vPort[2], vPort[3]);
+	framebuffer.endRender();
 }
 
 void Viewer::reshape_ortho(int w, int h)
@@ -322,7 +305,7 @@ void Viewer::draw()
 	render_backface();
 
 	raycasting_pass();
-//	glClearColor(0.2, 0.2, 0.2, 0.0);
+	//	glClearColor(0.2, 0.2, 0.2, 0.0);
 
 	framebuffer.disable();
 
