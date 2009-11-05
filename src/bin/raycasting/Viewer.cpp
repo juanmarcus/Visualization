@@ -241,39 +241,6 @@ void Viewer::raycasting_pass()
 	framebuffer.endRender();
 }
 
-void Viewer::reshape_ortho(int w, int h)
-{
-	if (h == 0)
-		h = 1;
-	glViewport(0, 0, w, h);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D(0, 1, 0, 1);
-	glMatrixMode(GL_MODELVIEW);
-}
-
-void Viewer::draw_fullscreen_quad()
-{
-	glDisable(GL_DEPTH_TEST);
-	glBegin(GL_QUADS);
-
-	glTexCoord2f(0, 0);
-	glVertex2f(0, 0);
-
-	glTexCoord2f(1, 0);
-	glVertex2f(1, 0);
-
-	glTexCoord2f(1, 1);
-
-	glVertex2f(1, 1);
-	glTexCoord2f(0, 1);
-	glVertex2f(0, 1);
-
-	glEnd();
-	glEnable(GL_DEPTH_TEST);
-
-}
-
 // display the final image on the screen
 void Viewer::render_buffer_to_screen()
 {
@@ -285,22 +252,20 @@ void Viewer::render_buffer_to_screen()
 		backface->enable();
 
 	start2DMode();
-	//	reshape_ortho(WINDOW_SIZE, WINDOW_SIZE);
-	//	draw_fullscreen_quad();
+
 	drawFullScreenQuad();
 
 	stop2DMode();
 
-	glDisable(GL_TEXTURE_2D);
 }
 
 void Viewer::draw()
 {
 	glDisable(GL_TEXTURE_2D);
 
-	framebuffer.enable();
-
 	glTranslatef(-0.5, -0.5, -0.5); // center the texturecube
+
+	framebuffer.enable();
 
 	render_backface();
 

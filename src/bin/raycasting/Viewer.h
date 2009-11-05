@@ -34,8 +34,6 @@ public:
 	void render_backface();
 	void raycasting_pass();
 	void render_buffer_to_screen();
-	void reshape_ortho(int w, int h);
-	void draw_fullscreen_quad();
 
 	// Texture control
 	void create_volumetexture();
