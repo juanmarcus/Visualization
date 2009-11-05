@@ -85,10 +85,11 @@ void Viewer::init()
 	volume_texture_param = fragmentProgram->getNamedParameter("volume_tex");
 	stepsize_param = fragmentProgram->getNamedParameter("stepsize");
 
-	// Create the to FBO's one for the backside of the volumecube and one for the finalimage rendering
+	// start framebuffer
 	glGenFramebuffersEXT(1, &framebuffer);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, framebuffer);
 
+	//Empty texture
 	glGenTextures(1, &backface_buffer);
 	glBindTexture(GL_TEXTURE_2D, backface_buffer);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -98,9 +99,12 @@ void Viewer::init()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F_ARB, WINDOW_SIZE, WINDOW_SIZE, 0,
 			GL_RGBA, GL_FLOAT, NULL);
+
+	// what is this?
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 			GL_TEXTURE_2D, backface_buffer, 0);
 
+	//Empty texture
 	glGenTextures(1, &final_image);
 	glBindTexture(GL_TEXTURE_2D, final_image);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -111,13 +115,26 @@ void Viewer::init()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F_ARB, WINDOW_SIZE, WINDOW_SIZE, 0,
 			GL_RGBA, GL_FLOAT, NULL);
 
-	glGenRenderbuffersEXT(1, &renderbuffer);
-	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, renderbuffer);
-	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT,
-			WINDOW_SIZE, WINDOW_SIZE);
-	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
-			GL_RENDERBUFFER_EXT, renderbuffer);
+	// start renderbuffer
+//	glGenRenderbuffersEXT(1, &renderbuffer);
+//	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, renderbuffer);
+
+	//what?
+//	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT,
+//			WINDOW_SIZE, WINDOW_SIZE);
+
+	//what?
+//	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
+//			GL_RENDERBUFFER_EXT, renderbuffer);
+
+	// deactivate framebuffer
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+	GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+	if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+	{
+		assert(0);
+	}
 
 	glDisable(GL_LIGHTING);
 
@@ -126,7 +143,7 @@ void Viewer::init()
 void Viewer::enable_renderbuffers()
 {
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, framebuffer);
-	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, renderbuffer);
+//	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, renderbuffer);
 }
 
 void Viewer::disable_renderbuffers()

@@ -45,7 +45,6 @@ public:
 	void create_volumetexture();
 
 	// CG stuff
-	GLuint renderbuffer;
 	GLuint framebuffer;
 
 	// the buffer textures
