@@ -11,6 +11,7 @@ using namespace ibi;
 void Viewer::create_volumetexture()
 {
 	textureManager.loadPlugin("../ibi/build/lib/libtexture_loader_nrrd3D.so");
+	textureManager.loadPlugin("../ibi/build/lib/libtexture_loader_empty.so");
 
 	Nrrd* nin = nrrdNew();
 	if (nrrdLoad(nin, "data/A-spgr-deface.nhdr", NULL))
@@ -85,70 +86,60 @@ void Viewer::init()
 	volume_texture_param = fragmentProgram->getNamedParameter("volume_tex");
 	stepsize_param = fragmentProgram->getNamedParameter("stepsize");
 
-	// start framebuffer
-	glGenFramebuffersEXT(1, &framebuffer);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, framebuffer);
+	// Start framebuffer
+	framebuffer.init();
+	framebuffer.enable();
 
-	//Empty texture
-	glGenTextures(1, &backface_buffer);
-	glBindTexture(GL_TEXTURE_2D, backface_buffer);
+	// Render textures specifications
+	TextureLoadingInfo info;
+	info.target = GL_TEXTURE_2D;
+	info.texture_type = "empty";
+	info.options["width"] = WINDOW_SIZE;
+	info.options["height"] = WINDOW_SIZE;
+	info.options["internalformat"] = GL_RGBA16F_ARB;
+	info.options["format"] = GL_RGBA;
+	info.options["type"] = GL_FLOAT;
+
+	// Backface
+	backface = textureManager.load(info);
+	backface->enable();
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F_ARB, WINDOW_SIZE, WINDOW_SIZE, 0,
-			GL_RGBA, GL_FLOAT, NULL);
 
-	// what is this?
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-			GL_TEXTURE_2D, backface_buffer, 0);
+	// Final image
+	final_image = textureManager.load(info);
+	final_image->enable();
 
-	//Empty texture
-	glGenTextures(1, &final_image);
-	glBindTexture(GL_TEXTURE_2D, final_image);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F_ARB, WINDOW_SIZE, WINDOW_SIZE, 0,
-			GL_RGBA, GL_FLOAT, NULL);
+	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+	// Set target texture to render
+	framebuffer.setTarget(backface);
 
 	// start renderbuffer
-//	glGenRenderbuffersEXT(1, &renderbuffer);
-//	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, renderbuffer);
+	//	glGenRenderbuffersEXT(1, &renderbuffer);
+	//	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, renderbuffer);
 
 	//what?
-//	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT,
-//			WINDOW_SIZE, WINDOW_SIZE);
+	//	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT,
+	//			WINDOW_SIZE, WINDOW_SIZE);
 
 	//what?
-//	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
-//			GL_RENDERBUFFER_EXT, renderbuffer);
+	//	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
+	//			GL_RENDERBUFFER_EXT, renderbuffer);
 
 	// deactivate framebuffer
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	framebuffer.disable();
 
-	GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-	if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+	FB_status status = framebuffer.getStatus();
+
+	if (status != FB_COMPLETE)
 	{
 		assert(0);
 	}
 
 	glDisable(GL_LIGHTING);
 
-}
-
-void Viewer::enable_renderbuffers()
-{
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, framebuffer);
-//	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, renderbuffer);
-}
-
-void Viewer::disable_renderbuffers()
-{
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
 void Viewer::vertex(float x, float y, float z)
@@ -211,8 +202,10 @@ void Viewer::drawQuads(float x, float y, float z)
 // render the backface to the offscreen buffer backface_buffer
 void Viewer::render_backface()
 {
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-			GL_TEXTURE_2D, backface_buffer, 0);
+	// draw to backface
+	framebuffer.setTarget(backface);
+//	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+//			GL_TEXTURE_2D, backface_buffer, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
@@ -222,8 +215,10 @@ void Viewer::render_backface()
 
 void Viewer::raycasting_pass()
 {
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-			GL_TEXTURE_2D, final_image, 0);
+	// Draw to final image
+	framebuffer.setTarget(final_image);
+//	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+//			GL_TEXTURE_2D, final_image, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	vertexProgram->enable();
@@ -231,9 +226,7 @@ void Viewer::raycasting_pass()
 
 	cgGLSetParameter1f(stepsize_param.cgparameter, stepsize);
 
-	cgGLSetTextureParameter(backface_texture_param.cgparameter, backface_buffer);
-	cgGLEnableTextureParameter(backface_texture_param.cgparameter);
-
+	backface_texture_param.setTexture(backface);
 	volume_texture_param.setTexture(volume);
 
 	glEnable(GL_CULL_FACE);
@@ -285,9 +278,9 @@ void Viewer::render_buffer_to_screen()
 	glLoadIdentity();
 	glEnable(GL_TEXTURE_2D);
 	if (toggle_visuals)
-		glBindTexture(GL_TEXTURE_2D, final_image);
+		final_image->enable();
 	else
-		glBindTexture(GL_TEXTURE_2D, backface_buffer);
+		backface->enable();
 	reshape_ortho(WINDOW_SIZE, WINDOW_SIZE);
 	draw_fullscreen_quad();
 	glDisable(GL_TEXTURE_2D);
@@ -295,7 +288,7 @@ void Viewer::render_buffer_to_screen()
 
 void Viewer::draw()
 {
-	enable_renderbuffers();
+	framebuffer.enable();
 
 	glTranslatef(-0.5, -0.5, -0.5); // center the texturecube
 
@@ -303,7 +296,7 @@ void Viewer::draw()
 
 	raycasting_pass();
 
-	disable_renderbuffers();
+	framebuffer.disable();
 
 	render_buffer_to_screen();
 }

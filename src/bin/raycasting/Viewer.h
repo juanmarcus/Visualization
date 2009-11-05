@@ -8,6 +8,7 @@
 #include "ibi_gl/Texture.h"
 #include "ibi_texturemanager/TextureManager.h"
 #include "ibi_gpuprogrammanager/GPUProgramManager.h"
+#include "ibi_framebuffer/Framebuffer.h"
 
 using namespace ibi;
 
@@ -37,19 +38,8 @@ public:
 	void reshape_ortho(int w, int h);
 	void draw_fullscreen_quad();
 
-	//renderbuffer control
-	void enable_renderbuffers();
-	void disable_renderbuffers();
-
 	// Texture control
 	void create_volumetexture();
-
-	// CG stuff
-	GLuint framebuffer;
-
-	// the buffer textures
-	GLuint backface_buffer; // the FBO buffers
-	GLuint final_image;
 
 	//rendering parameter
 	float stepsize;
@@ -59,14 +49,19 @@ public:
 	// Textures
 	TextureManager textureManager;
 	Texture* volume;
+	Texture* backface;
+	Texture* final_image;
 
-	//Shaders
+	// Shaders
 	GPUProgramManager shaderManager;
 	VertexProgram* vertexProgram;
 	FragmentProgram* fragmentProgram;
 	FragmentProgram::Parameter backface_texture_param;
 	FragmentProgram::Parameter volume_texture_param;
 	FragmentProgram::Parameter stepsize_param;
+
+	// Framebuffer
+	Framebuffer framebuffer;
 };
 
 #endif // VIEWER_H
