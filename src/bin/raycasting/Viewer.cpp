@@ -37,8 +37,11 @@ Viewer::Viewer(QWidget *parent) :
 	ibiQGLViewer(parent)
 {
 	toggle_visuals = true;
-	stepsize = 1.0 / 50.0;
+	stepsize = 1.0 / 100.0;
+
 	resize(WINDOW_SIZE, WINDOW_SIZE);
+
+	setDesiredAspectRatio(1.0);
 }
 
 Viewer::~Viewer()
@@ -71,7 +74,6 @@ void Viewer::init()
 	}
 
 	glEnable(GL_CULL_FACE);
-	glClearColor(0.0, 0.0, 0.0, 0);
 	create_volumetexture();
 
 	// CG init
@@ -140,6 +142,7 @@ void Viewer::init()
 
 	glDisable(GL_LIGHTING);
 
+	setDesiredAspectRatio(1.0);
 }
 
 void Viewer::vertex(float x, float y, float z)
@@ -204,21 +207,34 @@ void Viewer::render_backface()
 {
 	// draw to backface
 	framebuffer.setTarget(backface);
-//	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-//			GL_TEXTURE_2D, backface_buffer, 0);
+
+	int vPort[4];
+
+	glGetIntegerv(GL_VIEWPORT, vPort);
+
+	glViewport(0, 0, backface->getWidth(), backface->getHeight());
+
+	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
 	drawQuads(1.0, 1.0, 1.0);
 	glDisable(GL_CULL_FACE);
+
+	glViewport(vPort[0], vPort[1], vPort[2], vPort[3]);
 }
 
 void Viewer::raycasting_pass()
 {
 	// Draw to final image
 	framebuffer.setTarget(final_image);
-//	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-//			GL_TEXTURE_2D, final_image, 0);
+
+	int vPort[4];
+
+	glGetIntegerv(GL_VIEWPORT, vPort);
+
+	glViewport(0, 0, final_image->getWidth(), final_image->getHeight());
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	vertexProgram->enable();
@@ -236,6 +252,8 @@ void Viewer::raycasting_pass()
 
 	vertexProgram->disable();
 	fragmentProgram->disable();
+
+	glViewport(vPort[0], vPort[1], vPort[2], vPort[3]);
 }
 
 void Viewer::reshape_ortho(int w, int h)
@@ -275,19 +293,26 @@ void Viewer::draw_fullscreen_quad()
 void Viewer::render_buffer_to_screen()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
-	glEnable(GL_TEXTURE_2D);
+	//	glLoadIdentity();
 	if (toggle_visuals)
 		final_image->enable();
 	else
 		backface->enable();
-	reshape_ortho(WINDOW_SIZE, WINDOW_SIZE);
-	draw_fullscreen_quad();
+
+	start2DMode();
+	//	reshape_ortho(WINDOW_SIZE, WINDOW_SIZE);
+	//	draw_fullscreen_quad();
+	drawFullScreenQuad();
+
+	stop2DMode();
+
 	glDisable(GL_TEXTURE_2D);
 }
 
 void Viewer::draw()
 {
+	glDisable(GL_TEXTURE_2D);
+
 	framebuffer.enable();
 
 	glTranslatef(-0.5, -0.5, -0.5); // center the texturecube
@@ -295,6 +320,7 @@ void Viewer::draw()
 	render_backface();
 
 	raycasting_pass();
+//	glClearColor(0.2, 0.2, 0.2, 0.0);
 
 	framebuffer.disable();
 

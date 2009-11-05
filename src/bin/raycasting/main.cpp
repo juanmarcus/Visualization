@@ -16,7 +16,7 @@ int main(int argc, char **argv)
 	// Create a ImageWidget
 	Viewer w;
 	// Show the widget
-	w.show();
+	w.showMaximized();
 	// Run the application loop
 	return app.exec();
 }

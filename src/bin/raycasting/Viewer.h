@@ -13,7 +13,6 @@
 using namespace ibi;
 
 // Volume size
-#define VOLUME_TEX_SIZE 128
 #define WINDOW_SIZE 800
 
 class Viewer: public ibiQGLViewer
