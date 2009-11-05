@@ -10,7 +10,7 @@ using namespace ibi;
 // create a test volume texture, here you could load your own volume
 void Viewer::create_volumetexture()
 {
-	manager.loadPlugin("../ibi/build/lib/libtexture_loader_nrrd3D.so");
+	textureManager.loadPlugin("../ibi/build/lib/libtexture_loader_nrrd3D.so");
 
 	Nrrd* nin = nrrdNew();
 	if (nrrdLoad(nin, "data/A-spgr-deface.nhdr", NULL))
@@ -24,7 +24,7 @@ void Viewer::create_volumetexture()
 	info.texture_type = "nrrd3D";
 	info.options["nrrd"] = nin;
 
-	volume = manager.load(info);
+	volume = textureManager.load(info);
 
 	volume->disable();
 
@@ -43,36 +43,6 @@ Viewer::Viewer(QWidget *parent) :
 Viewer::~Viewer()
 {
 
-}
-
-// load_vertex_program: loading a vertex program
-void Viewer::load_vertex_program(CGprogram &v_program, char *shader_path,
-		char *program_name)
-{
-	assert(cgIsContext(context));
-	v_program = cgCreateProgramFromFile(context, CG_SOURCE, shader_path,
-			vertexProfile, program_name, NULL);
-	if (!cgIsProgramCompiled(v_program))
-		cgCompileProgram(v_program);
-
-	cgGLEnableProfile(vertexProfile);
-	cgGLLoadProgram(v_program);
-	cgGLDisableProfile(vertexProfile);
-}
-
-// load_fragment_program: loading a fragment program
-void Viewer::load_fragment_program(CGprogram &f_program, char *shader_path,
-		char *program_name)
-{
-	assert(cgIsContext(context));
-	f_program = cgCreateProgramFromFile(context, CG_SOURCE, shader_path,
-			fragmentProfile, program_name, NULL);
-	if (!cgIsProgramCompiled(f_program))
-		cgCompileProgram(f_program);
-
-	cgGLEnableProfile(fragmentProfile);
-	cgGLLoadProgram(f_program);
-	cgGLDisableProfile(fragmentProfile);
 }
 
 void Viewer::init()
@@ -104,51 +74,16 @@ void Viewer::init()
 	create_volumetexture();
 
 	// CG init
-	//	cgSetErrorCallback(cgErrorCallback);
-	context = cgCreateContext();
-	if (cgGLIsProfileSupported(CG_PROFILE_VP40))
-	{
-		vertexProfile = CG_PROFILE_VP40;
-		cout << "CG_PROFILE_VP40 supported." << endl;
-	}
-	else
-	{
-		if (cgGLIsProfileSupported(CG_PROFILE_ARBVP1))
-			vertexProfile = CG_PROFILE_ARBVP1;
-		else
-		{
-			cout
-					<< "Neither arbvp1 or vp40 vertex profiles supported on this system."
-					<< endl;
-			exit(1);
-		}
-	}
+	shaderManager.init();
+	vertexProgram = shaderManager.loadVertexProgram(
+			"Shaders/raycasting_shader.cg", "vertex_main");
 
-	if (cgGLIsProfileSupported(CG_PROFILE_FP40))
-	{
-		fragmentProfile = CG_PROFILE_FP40;
-		cout << "CG_PROFILE_FP40 supported." << endl;
-	}
-	else
-	{
-		if (cgGLIsProfileSupported(CG_PROFILE_ARBFP1))
-			fragmentProfile = CG_PROFILE_ARBFP1;
-		else
-		{
-			cout
-					<< "Neither arbfp1 or fp40 fragment profiles supported on this system."
-					<< endl;
-			exit(1);
-		}
-	}
+	fragmentProgram = shaderManager.loadFragmentProgram(
+			"Shaders/raycasting_shader.cg", "fragment_main");
 
-	// load the vertex and fragment raycasting programs
-	load_vertex_program(vertex_main, "Shaders/raycasting_shader.cg",
-			"vertex_main");
-	checkError();
-	load_fragment_program(fragment_main, "Shaders/raycasting_shader.cg",
-			"fragment_main");
-	checkError();
+	backface_texture_param = fragmentProgram->getNamedParameter("tex");
+	volume_texture_param = fragmentProgram->getNamedParameter("volume_tex");
+	stepsize_param = fragmentProgram->getNamedParameter("stepsize");
 
 	// Create the to FBO's one for the backside of the volumecube and one for the finalimage rendering
 	glGenFramebuffersEXT(1, &framebuffer);
@@ -186,17 +121,6 @@ void Viewer::init()
 
 	glDisable(GL_LIGHTING);
 
-}
-
-void Viewer::checkError()
-{
-	CGerror lastError = cgGetError();
-	if (lastError)
-	{
-		cout << cgGetErrorString(lastError) << endl;
-		if (context != NULL)
-			cout << cgGetLastListing(context) << endl;
-	}
 }
 
 void Viewer::enable_renderbuffers()
@@ -279,33 +203,29 @@ void Viewer::render_backface()
 	glDisable(GL_CULL_FACE);
 }
 
-// Sets a uniform texture parameter
-void Viewer::set_tex_param(char* par, GLuint tex, const CGprogram &program,
-		CGparameter param)
-{
-	param = cgGetNamedParameter(program, par);
-	cgGLSetTextureParameter(param, tex);
-	cgGLEnableTextureParameter(param);
-}
-
 void Viewer::raycasting_pass()
 {
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 			GL_TEXTURE_2D, final_image, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	cgGLEnableProfile(vertexProfile);
-	cgGLEnableProfile(fragmentProfile);
-	cgGLBindProgram(vertex_main);
-	cgGLBindProgram(fragment_main);
-	cgGLSetParameter1f(cgGetNamedParameter(fragment_main, "stepsize"), stepsize);
-	set_tex_param("tex", backface_buffer, fragment_main, param1);
-	set_tex_param("volume_tex", volume->getGLName(), fragment_main, param2);
+
+	vertexProgram->enable();
+	fragmentProgram->enable();
+
+	cgGLSetParameter1f(stepsize_param.cgparameter, stepsize);
+
+	cgGLSetTextureParameter(backface_texture_param.cgparameter, backface_buffer);
+	cgGLEnableTextureParameter(backface_texture_param.cgparameter);
+
+	volume_texture_param.setTexture(volume);
+
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	drawQuads(1.0, 1.0, 1.0);
 	glDisable(GL_CULL_FACE);
-	cgGLDisableProfile(vertexProfile);
-	cgGLDisableProfile(fragmentProfile);
+
+	vertexProgram->disable();
+	fragmentProgram->disable();
 }
 
 void Viewer::reshape_ortho(int w, int h)

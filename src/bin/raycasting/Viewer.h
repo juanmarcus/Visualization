@@ -7,6 +7,7 @@
 #include "ibi_qt/ibiQGLViewer.h"
 #include "ibi_gl/Texture.h"
 #include "ibi_texturemanager/TextureManager.h"
+#include "ibi_gpuprogrammanager/GPUProgramManager.h"
 
 using namespace ibi;
 
@@ -40,42 +41,33 @@ public:
 	void enable_renderbuffers();
 	void disable_renderbuffers();
 
-	// Error handling
-	void checkError();
-
 	// Texture control
 	void create_volumetexture();
 
-	// Shader control
-	void load_vertex_program(CGprogram &v_program, char *shader_path,
-			char *program_name);
-	void load_fragment_program(CGprogram &f_program, char *shader_path,
-			char *program_name);
-	void set_tex_param(char* par, GLuint tex, const CGprogram &program,
-			CGparameter param);
-
 	// CG stuff
-	CGcontext context;
-	CGprofile vertexProfile, fragmentProfile;
 	GLuint renderbuffer;
 	GLuint framebuffer;
-
-	// shaders
-	CGprogram vertex_main, fragment_main; // the raycasting shader programs
-	CGparameter param1, param2;
 
 	// the buffer textures
 	GLuint backface_buffer; // the FBO buffers
 	GLuint final_image;
-	GLuint volume_texture;
 
 	//rendering parameter
 	float stepsize;
 	bool toggle_visuals;
 
 	//--------------------------------
-	TextureManager manager;
+	// Textures
+	TextureManager textureManager;
 	Texture* volume;
+
+	//Shaders
+	GPUProgramManager shaderManager;
+	VertexProgram* vertexProgram;
+	FragmentProgram* fragmentProgram;
+	FragmentProgram::Parameter backface_texture_param;
+	FragmentProgram::Parameter volume_texture_param;
+	FragmentProgram::Parameter stepsize_param;
 };
 
 #endif // VIEWER_H
