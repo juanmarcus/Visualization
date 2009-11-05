@@ -142,6 +142,8 @@ void Viewer::init()
 
 	glDisable(GL_LIGHTING);
 
+	setSceneRadius(0.65);
+	showEntireScene();
 	setDesiredAspectRatio(1.0);
 }
 
