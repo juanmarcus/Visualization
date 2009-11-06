@@ -12,9 +12,6 @@
 
 using namespace ibi;
 
-// Volume size
-#define WINDOW_SIZE 800
-
 class Viewer: public ibiQGLViewer
 {
 Q_OBJECT

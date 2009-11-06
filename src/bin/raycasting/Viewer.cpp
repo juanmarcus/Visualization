@@ -41,8 +41,6 @@ Viewer::Viewer(QWidget *parent) :
 	toggle_visuals = true;
 	stepsize = 1.0 / 100.0;
 
-	resize(WINDOW_SIZE, WINDOW_SIZE);
-
 	setDesiredAspectRatio(1.0);
 }
 
@@ -98,8 +96,8 @@ void Viewer::init()
 	TextureLoadingInfo info;
 	info.target = GL_TEXTURE_2D;
 	info.texture_type = "empty";
-	info.options["width"] = WINDOW_SIZE;
-	info.options["height"] = WINDOW_SIZE;
+	info.options["width"] = 800;
+	info.options["height"] = 800;
 	info.options["internalformat"] = GL_RGBA16F_ARB;
 	info.options["format"] = GL_RGBA;
 	info.options["type"] = GL_FLOAT;
