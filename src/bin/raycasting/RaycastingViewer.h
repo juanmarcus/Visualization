@@ -12,31 +12,33 @@
 
 using namespace ibi;
 
-class Viewer: public ibiQGLViewer
+class RaycastingViewer: public ibiQGLViewer
 {
 Q_OBJECT
 
 public:
-	Viewer(QWidget *parent = 0);
-	~Viewer();
+	RaycastingViewer(QWidget *parent = 0);
+	~RaycastingViewer();
 
 	void init();
 	void draw();
 
+private:
+	// Texture control
+	void create_volumetexture();
+
 	//draw geometry
 	void vertex(float x, float y, float z);
 	void drawQuads(float x, float y, float z);
-
 	//raycasting methods
 	void render_backface();
 	void raycasting_pass();
 	void render_buffer_to_screen();
-
-	// Texture control
-	void create_volumetexture();
-
-	//rendering parameter
+	/*
+	 * Distance between samples in a ray.
+	 */
 	float stepsize;
+
 	bool toggle_visuals;
 
 	//--------------------------------

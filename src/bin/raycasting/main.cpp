@@ -7,14 +7,14 @@
 
 #include "ibi_gl/ibi_gl.h"
 #include <QtGui/QApplication>
-#include "Viewer.h"
+#include "RaycastingViewer.h"
 
 int main(int argc, char **argv)
 {
 	// Create an application
 	QApplication app(argc, argv);
 	// Create a ImageWidget
-	Viewer w;
+	RaycastingViewer w;
 	// Show the widget
 	w.showMaximized();
 	// Run the application loop

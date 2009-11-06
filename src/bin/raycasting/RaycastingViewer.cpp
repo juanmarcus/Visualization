@@ -1,4 +1,4 @@
-#include "Viewer.h"
+#include "RaycastingViewer.h"
 
 #include "ibi_geometry/Vector3.h"
 #include <teem/nrrd.h>
@@ -8,11 +8,12 @@ using namespace std;
 using namespace ibi;
 
 // create a test volume texture, here you could load your own volume
-void Viewer::create_volumetexture()
+void RaycastingViewer::create_volumetexture()
 {
 	textureManager.loadPlugin("../ibi/build/lib/libtexture_loader_nrrd3D.so");
 	textureManager.loadPlugin("../ibi/build/lib/libtexture_loader_empty.so");
-	textureManager.loadPlugin("../ibi/build/lib/libtexture_loader_transfer_func.so");
+	textureManager.loadPlugin(
+			"../ibi/build/lib/libtexture_loader_transfer_func.so");
 
 	Nrrd* nin = nrrdNew();
 	if (nrrdLoad(nin, "data/A-spgr-deface_quant.nhdr", NULL))
@@ -36,7 +37,7 @@ void Viewer::create_volumetexture()
 
 }
 
-Viewer::Viewer(QWidget *parent) :
+RaycastingViewer::RaycastingViewer(QWidget *parent) :
 	ibiQGLViewer(parent)
 {
 	toggle_visuals = true;
@@ -45,12 +46,12 @@ Viewer::Viewer(QWidget *parent) :
 	setDesiredAspectRatio(1.0);
 }
 
-Viewer::~Viewer()
+RaycastingViewer::~RaycastingViewer()
 {
 
 }
 
-void Viewer::init()
+void RaycastingViewer::init()
 {
 	// Initialize glew
 	GLenum err = glewInit();
@@ -151,7 +152,7 @@ void Viewer::init()
 	setDesiredAspectRatio(1.0);
 }
 
-void Viewer::vertex(float x, float y, float z)
+void RaycastingViewer::vertex(float x, float y, float z)
 {
 	glColor3f(x, y, z);
 	glMultiTexCoord3fARB(GL_TEXTURE1_ARB, x, y, z);
@@ -159,7 +160,7 @@ void Viewer::vertex(float x, float y, float z)
 }
 
 // this method is used to draw the front and backside of the volume
-void Viewer::drawQuads(float x, float y, float z)
+void RaycastingViewer::drawQuads(float x, float y, float z)
 {
 
 	glBegin(GL_QUADS);
@@ -209,7 +210,7 @@ void Viewer::drawQuads(float x, float y, float z)
 }
 
 // render the backface to the offscreen buffer backface_buffer
-void Viewer::render_backface()
+void RaycastingViewer::render_backface()
 {
 	// draw to backface
 	framebuffer.setTarget(backface);
@@ -225,7 +226,7 @@ void Viewer::render_backface()
 	framebuffer.endRender();
 }
 
-void Viewer::raycasting_pass()
+void RaycastingViewer::raycasting_pass()
 {
 	// Draw to final image
 	framebuffer.setTarget(final_image);
@@ -254,10 +255,10 @@ void Viewer::raycasting_pass()
 }
 
 // display the final image on the screen
-void Viewer::render_buffer_to_screen()
+void RaycastingViewer::render_buffer_to_screen()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//	glLoadIdentity();
+
 	if (toggle_visuals)
 		final_image->enable();
 	else
@@ -271,7 +272,7 @@ void Viewer::render_buffer_to_screen()
 
 }
 
-void Viewer::draw()
+void RaycastingViewer::draw()
 {
 	glDisable(GL_TEXTURE_2D);
 
