@@ -58,23 +58,7 @@ public:
 
 		start2DMode();
 
-		glColor3d(1.0, 1.0, 1.0);
-
-		glBegin(GL_QUADS);
-
-		glTexCoord2d(0.0, 0.0);
-		glVertex2d(0.0, 0.0);
-
-		glTexCoord2d(1.0, 0.0);
-		glVertex2d(1.0, 0.0);
-
-		glTexCoord2d(1.0, 1.0);
-		glVertex2d(1.0, 1.0);
-
-		glTexCoord2d(0.0, 1.0);
-		glVertex2d(0.0, 1.0);
-
-		glEnd();
+		drawFullScreenQuad();
 
 		stop2DMode();
 	}
