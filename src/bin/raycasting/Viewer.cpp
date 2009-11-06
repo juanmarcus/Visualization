@@ -12,6 +12,7 @@ void Viewer::create_volumetexture()
 {
 	textureManager.loadPlugin("../ibi/build/lib/libtexture_loader_nrrd3D.so");
 	textureManager.loadPlugin("../ibi/build/lib/libtexture_loader_empty.so");
+	textureManager.loadPlugin("../ibi/build/lib/libtexture_loader_transfer_func.so");
 
 	Nrrd* nin = nrrdNew();
 	if (nrrdLoad(nin, "data/A-spgr-deface_quant.nhdr", NULL))
@@ -86,6 +87,7 @@ void Viewer::init()
 
 	backface_texture_param = fragmentProgram->getNamedParameter("tex");
 	volume_texture_param = fragmentProgram->getNamedParameter("volume_tex");
+	transfer_function_param = fragmentProgram->getNamedParameter("txf_func");
 	stepsize_param = fragmentProgram->getNamedParameter("stepsize");
 
 	// Start framebuffer
@@ -114,6 +116,15 @@ void Viewer::init()
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+	// Transfer function
+	TextureLoadingInfo txf_info;
+	txf_info.target = GL_TEXTURE_1D;
+	txf_info.texture_type = "transfer_func";
+	txf_info.options["filename"] = String("data/txf_func.png");
+
+	transfer_function = textureManager.load(txf_info);
+	transfer_function->disable();
 
 	// Set target texture to render
 	framebuffer.setTarget(backface);
@@ -229,6 +240,7 @@ void Viewer::raycasting_pass()
 
 	backface_texture_param.setTexture(backface);
 	volume_texture_param.setTexture(volume);
+	transfer_function_param.setTexture(transfer_function);
 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);

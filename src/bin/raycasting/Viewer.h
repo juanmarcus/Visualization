@@ -45,6 +45,7 @@ public:
 	Texture* volume;
 	Texture* backface;
 	Texture* final_image;
+	Texture* transfer_function;
 
 	// Shaders
 	GPUProgramManager shaderManager;
@@ -52,6 +53,7 @@ public:
 	FragmentProgram* fragmentProgram;
 	FragmentProgram::Parameter backface_texture_param;
 	FragmentProgram::Parameter volume_texture_param;
+	FragmentProgram::Parameter transfer_function_param;
 	FragmentProgram::Parameter stepsize_param;
 
 	// Framebuffer

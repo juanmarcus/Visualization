@@ -43,7 +43,8 @@ vertex_fragment vertex_main( app_vertex IN )
 // Raycasting fragment program implementation
 fragment_out fragment_main( vertex_fragment IN,
 			    uniform sampler2D tex, 
-                            uniform sampler3D volume_tex, 
+                uniform sampler3D volume_tex, 
+                uniform sampler1D txf_func,
 			    uniform float stepsize			  
 			   )
 		  
@@ -65,13 +66,17 @@ fragment_out fragment_main( vertex_fragment IN,
   float4 col_acc = float4(0,0,0,0);
   float alpha_acc = 0;
   float length_acc = 0;
+  float value;
   float4 color_sample;
   float alpha_sample;
 
   for(int i = 0; i < 450; i++)
     {
-      color_sample = tex3D(volume_tex,vec);
+      value = tex3D(volume_tex,vec).a;
+      color_sample = tex1D(txf_func,value);
+      //color_sample = float4(value,value,value,1.0);
       alpha_sample = color_sample.a * stepsize;
+      //if (value < 0.2) alpha_sample = 0.0;
       col_acc   += (1.0 - alpha_acc) * color_sample * alpha_sample * 3;
       alpha_acc += alpha_sample;
       vec += delta_dir;
