@@ -40,8 +40,9 @@ void Viewer::init()
 	sampler.setNrrd(nin);
 	sampler.update();
 
-	textureManager.loadPlugin("../ibi/build/lib/libtexture_loader_nrrd.so");
-	loader = textureManager.getLoader("nrrd");
+	textureManager = TextureManager::getInstance();
+	textureManager->loadPlugin("../ibi/build/lib/libtexture_loader_nrrd.so");
+	loader = textureManager->getLoader("nrrd");
 }
 
 void Viewer::draw()

@@ -1,6 +1,7 @@
-#ifndef VIEWER_H
-#define VIEWER_H
+#ifndef RAYCASTINGVIEWER_H
+#define RAYCASTINGVIEWER_H
 
+#include "ibi.h"
 #include "ibi_gl/ibi_gl.h"
 #include "Cg/cg.h"
 #include "Cg/cgGL.h"
@@ -10,7 +11,8 @@
 #include "ibi_gpuprogrammanager/GPUProgramManager.h"
 #include "ibi_framebuffer/Framebuffer.h"
 
-using namespace ibi;
+namespace ibi
+{
 
 class RaycastingViewer: public ibiQGLViewer
 {
@@ -21,6 +23,8 @@ public:
 	~RaycastingViewer();
 
 	void init();
+	virtual void initRaycasting();
+
 	void draw();
 
 private:
@@ -41,15 +45,14 @@ private:
 
 	bool toggle_visuals;
 
-	//--------------------------------
 	// Textures
-	TextureManager textureManager;
+	TextureManager* textureManager;
 	Texture* volume;
 	Texture* backface;
 	Texture* final_image;
 	Texture* transfer_function;
 
-	// Shaders
+	// GPU programs and parameters
 	GPUProgramManager shaderManager;
 	VertexProgram* vertexProgram;
 	FragmentProgram* fragmentProgram;
@@ -58,8 +61,10 @@ private:
 	FragmentProgram::Parameter transfer_function_param;
 	FragmentProgram::Parameter stepsize_param;
 
-	// Framebuffer
+	// Framebuffer object
 	Framebuffer framebuffer;
 };
 
-#endif // VIEWER_H
+} // namespace ibi
+
+#endif // RAYCASTINGVIEWER_H

@@ -44,8 +44,9 @@ public:
 		textures.resize(nin->axis[axis].size, NULL);
 		range = nrrdRangeNewSet(nin, 0);
 
-		textureManager.loadPlugin("../ibi/build/lib/libtexture_loader_nrrd.so");
-		nrrdTextureLoader = textureManager.getLoader("nrrd");
+		textureManager = TextureManager::getInstance();
+		textureManager->loadPlugin("../ibi/build/lib/libtexture_loader_nrrd.so");
+		nrrdTextureLoader = textureManager->getLoader("nrrd");
 
 		setDesiredAspectRatio(1.0);
 	}
@@ -114,7 +115,7 @@ public:
 private:
 	vector<Texture*> textures;
 	int currentSlice;
-	TextureManager textureManager;
+	TextureManager* textureManager;
 	TextureLoader* nrrdTextureLoader;
 	//	GLMode2D mode2d;
 	NrrdRange* range;

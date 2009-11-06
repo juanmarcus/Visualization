@@ -5,14 +5,16 @@
 #include <iostream>
 
 using namespace std;
-using namespace ibi;
+
+namespace ibi
+{
 
 // create a test volume texture, here you could load your own volume
 void RaycastingViewer::create_volumetexture()
 {
-	textureManager.loadPlugin("../ibi/build/lib/libtexture_loader_nrrd3D.so");
-	textureManager.loadPlugin("../ibi/build/lib/libtexture_loader_empty.so");
-	textureManager.loadPlugin(
+	textureManager->loadPlugin("../ibi/build/lib/libtexture_loader_nrrd3D.so");
+	textureManager->loadPlugin("../ibi/build/lib/libtexture_loader_empty.so");
+	textureManager->loadPlugin(
 			"../ibi/build/lib/libtexture_loader_transfer_func.so");
 
 	Nrrd* nin = nrrdNew();
@@ -27,7 +29,7 @@ void RaycastingViewer::create_volumetexture()
 	info.texture_type = "nrrd3D";
 	info.options["nrrd"] = nin;
 
-	volume = textureManager.load(info);
+	volume = textureManager->load(info);
 
 	volume->disable();
 
@@ -76,7 +78,6 @@ void RaycastingViewer::init()
 	}
 
 	glEnable(GL_CULL_FACE);
-	create_volumetexture();
 
 	// CG init
 	shaderManager.init();
@@ -95,6 +96,10 @@ void RaycastingViewer::init()
 	framebuffer.init();
 	framebuffer.enable();
 
+	// Start texture manager
+	textureManager = TextureManager::getInstance();
+	create_volumetexture();
+
 	// Render textures specifications
 	TextureLoadingInfo info;
 	info.target = GL_TEXTURE_2D;
@@ -106,12 +111,12 @@ void RaycastingViewer::init()
 	info.options["type"] = GL_FLOAT;
 
 	// Backface
-	backface = textureManager.load(info);
+	backface = textureManager->load(info);
 	backface->enable();
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
 	// Final image
-	final_image = textureManager.load(info);
+	final_image = textureManager->load(info);
 	final_image->enable();
 
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -124,7 +129,7 @@ void RaycastingViewer::init()
 	txf_info.texture_type = "transfer_func";
 	txf_info.options["filename"] = String("data/txf_func.png");
 
-	transfer_function = textureManager.load(txf_info);
+	transfer_function = textureManager->load(txf_info);
 	transfer_function->disable();
 
 	// Set target texture to render
@@ -150,6 +155,13 @@ void RaycastingViewer::init()
 	setSceneRadius(0.65);
 	showEntireScene();
 	setDesiredAspectRatio(1.0);
+
+	initRaycasting();
+}
+
+void RaycastingViewer::initRaycasting()
+{
+
 }
 
 void RaycastingViewer::vertex(float x, float y, float z)
@@ -289,3 +301,5 @@ void RaycastingViewer::draw()
 
 	render_buffer_to_screen();
 }
+
+} // namespace ibi

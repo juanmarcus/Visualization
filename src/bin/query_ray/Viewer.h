@@ -24,7 +24,7 @@ public:
 	void draw();
 private:
 	// Textures
-	TextureManager textureManager;
+	TextureManager* textureManager;
 	TextureLoader* loader;
 
 	// drawing
