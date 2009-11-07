@@ -1,7 +1,6 @@
 #include "RaycastingViewer.h"
 
 #include "ibi_geometry/Vector3.h"
-#include <teem/nrrd.h>
 #include <iostream>
 
 using namespace std;
@@ -9,41 +8,13 @@ using namespace std;
 namespace ibi
 {
 
-// create a test volume texture, here you could load your own volume
-void RaycastingViewer::create_volumetexture()
-{
-	textureManager->loadPlugin("../ibi/build/lib/libtexture_loader_nrrd3D.so");
-	textureManager->loadPlugin("../ibi/build/lib/libtexture_loader_empty.so");
-	textureManager->loadPlugin(
-			"../ibi/build/lib/libtexture_loader_transfer_func.so");
-
-	Nrrd* nin = nrrdNew();
-	if (nrrdLoad(nin, "data/A-spgr-deface_quant.nhdr", NULL))
-	{
-		char* err = biffGetDone(NRRD);
-		cerr << err << endl;
-	}
-
-	TextureLoadingInfo info;
-	info.target = GL_TEXTURE_3D;
-	info.texture_type = "nrrd3D";
-	info.options["nrrd"] = nin;
-
-	volume = textureManager->load(info);
-
-	volume->disable();
-
-	nrrdNuke(nin);
-
-	cout << "volume texture created" << endl;
-
-}
-
 RaycastingViewer::RaycastingViewer(QWidget *parent) :
 	ibiQGLViewer(parent)
 {
 	toggle_visuals = true;
 	stepsize = 1.0 / 100.0;
+	volume = 0;
+	transfer_function = 0;
 
 	setDesiredAspectRatio(1.0);
 }
@@ -54,6 +25,22 @@ RaycastingViewer::~RaycastingViewer()
 }
 
 void RaycastingViewer::init()
+{
+	initGlew();
+	initCG();
+	initFramebuffer();
+
+	// Set some rendering parameters
+	glDisable(GL_LIGHTING);
+	setSceneRadius(0.65);
+	showEntireScene();
+	setDesiredAspectRatio(1.0);
+
+	// Call user initialization
+	initRaycasting();
+}
+
+void RaycastingViewer::initGlew()
 {
 	// Initialize glew
 	GLenum err = glewInit();
@@ -76,9 +63,10 @@ void RaycastingViewer::init()
 	{
 		cout << "Driver does not support OpenGL Shading Language" << endl;
 	}
+}
 
-	glEnable(GL_CULL_FACE);
-
+void RaycastingViewer::initCG()
+{
 	// CG init
 	shaderManager.init();
 	vertexProgram = shaderManager.loadVertexProgram(
@@ -91,14 +79,18 @@ void RaycastingViewer::init()
 	volume_texture_param = fragmentProgram->getNamedParameter("volume_tex");
 	transfer_function_param = fragmentProgram->getNamedParameter("txf_func");
 	stepsize_param = fragmentProgram->getNamedParameter("stepsize");
+}
 
+void RaycastingViewer::initFramebuffer()
+{
 	// Start framebuffer
 	framebuffer.init();
+
 	framebuffer.enable();
 
 	// Start texture manager
 	textureManager = TextureManager::getInstance();
-	create_volumetexture();
+	textureManager->loadPlugin("../ibi/build/lib/libtexture_loader_empty.so");
 
 	// Render textures specifications
 	TextureLoadingInfo info;
@@ -114,49 +106,18 @@ void RaycastingViewer::init()
 	backface = textureManager->load(info);
 	backface->enable();
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	backface->disable();
 
 	// Final image
 	final_image = textureManager->load(info);
 	final_image->enable();
-
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	final_image->disable();
+
 	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-	// Transfer function
-	TextureLoadingInfo txf_info;
-	txf_info.target = GL_TEXTURE_1D;
-	txf_info.texture_type = "transfer_func";
-	txf_info.options["filename"] = String("data/txf_func.png");
-
-	transfer_function = textureManager->load(txf_info);
-	transfer_function->disable();
-
-	// Set target texture to render
-	framebuffer.setTarget(backface);
-
-	// start renderbuffer
-	//	glGenRenderbuffersEXT(1, &renderbuffer);
-	//	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, renderbuffer);
-
-	//what?
-	//	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT,
-	//			WINDOW_SIZE, WINDOW_SIZE);
-
-	//what?
-	//	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
-	//			GL_RENDERBUFFER_EXT, renderbuffer);
-
-	// deactivate framebuffer
 	framebuffer.disable();
-
-	glDisable(GL_LIGHTING);
-
-	setSceneRadius(0.65);
-	showEntireScene();
-	setDesiredAspectRatio(1.0);
-
-	initRaycasting();
 }
 
 void RaycastingViewer::initRaycasting()
@@ -233,7 +194,6 @@ void RaycastingViewer::render_backface()
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
 	drawQuads(1.0, 1.0, 1.0);
-	glDisable(GL_CULL_FACE);
 
 	framebuffer.endRender();
 }
@@ -255,7 +215,6 @@ void RaycastingViewer::raycasting_pass()
 	volume_texture_param.setTexture(volume);
 	transfer_function_param.setTexture(transfer_function);
 
-	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	drawQuads(1.0, 1.0, 1.0);
 	glDisable(GL_CULL_FACE);
@@ -282,24 +241,42 @@ void RaycastingViewer::render_buffer_to_screen()
 
 	stop2DMode();
 
+	if (toggle_visuals)
+		final_image->disable();
+	else
+		backface->disable();
+
 }
 
 void RaycastingViewer::draw()
 {
-	glDisable(GL_TEXTURE_2D);
+	// do not draw if volume or transfer function not set
+	if (!this->volume and !this->transfer_function)
+	{
+		return;
+	}
 
-	glTranslatef(-0.5, -0.5, -0.5); // center the texturecube
+	glTranslatef(-0.5, -0.5, -0.5); // center the texture cube
 
 	framebuffer.enable();
 
 	render_backface();
 
 	raycasting_pass();
-	//	glClearColor(0.2, 0.2, 0.2, 0.0);
 
 	framebuffer.disable();
 
 	render_buffer_to_screen();
+}
+
+void RaycastingViewer::setVolume(Texture* t)
+{
+	this->volume = t;
+}
+
+void RaycastingViewer::setTransferFunction(Texture* t)
+{
+	this->transfer_function = t;
 }
 
 } // namespace ibi

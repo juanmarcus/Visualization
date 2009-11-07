@@ -14,6 +14,17 @@ public:
 	~Viewer();
 
 	void initRaycasting();
+
+	Texture* loadVolume(String filename);
+private:
+	// Volume texture
+	Texture* volumeTexture;
+
+	// Transfer function
+	Texture* transferFunction;
+
+	// Texture manager
+	TextureManager* textureManager;
 };
 
 #endif // VIEWER_H

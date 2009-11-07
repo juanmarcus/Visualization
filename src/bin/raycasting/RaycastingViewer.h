@@ -23,14 +23,17 @@ public:
 	~RaycastingViewer();
 
 	void init();
-	virtual void initRaycasting();
-
+	void initGlew();
+	void initCG();
+	void initFramebuffer();
 	void draw();
 
-private:
-	// Texture control
-	void create_volumetexture();
+	virtual void initRaycasting();
 
+	void setVolume(Texture* t);
+	void setTransferFunction(Texture* t);
+
+private:
 	//draw geometry
 	void vertex(float x, float y, float z);
 	void drawQuads(float x, float y, float z);
@@ -38,6 +41,7 @@ private:
 	void render_backface();
 	void raycasting_pass();
 	void render_buffer_to_screen();
+
 	/*
 	 * Distance between samples in a ray.
 	 */
