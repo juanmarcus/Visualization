@@ -42,7 +42,6 @@ void Viewer::init()
 
 	textureManager = TextureManager::getInstance();
 	textureManager->loadPlugin("../ibi/build/lib/libtexture_loader_nrrd.so");
-	loader = textureManager->getLoader("nrrd");
 }
 
 void Viewer::draw()
@@ -119,7 +118,7 @@ void Viewer::draw()
 		// Determine value range
 		NrrdRange* range = nrrdRangeNewSet(wr, 0);
 
-		// Make historgram
+		// Make histogram
 		Nrrd* dhist = nrrdNew();
 		if (nrrdHistoDraw(dhist, wr, 50, 1, range->max))
 		{
@@ -133,8 +132,9 @@ void Viewer::draw()
 		// Create a texture from the histogram
 		TextureLoadingInfo info;
 		info.target = GL_TEXTURE_2D;
+		info.texture_type = "nrrd";
 		info.options["nrrd"] = dhist;
-		Texture* t = loader->load(info);
+		Texture* t = textureManager->load(info);
 
 		// Show texture
 		mode2d.enable();

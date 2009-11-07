@@ -25,7 +25,6 @@ public:
 private:
 	// Textures
 	TextureManager* textureManager;
-	TextureLoader* loader;
 
 	// drawing
 	GeometryDrawer drawer;

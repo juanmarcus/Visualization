@@ -46,7 +46,6 @@ public:
 
 		textureManager = TextureManager::getInstance();
 		textureManager->loadPlugin("../ibi/build/lib/libtexture_loader_nrrd.so");
-		nrrdTextureLoader = textureManager->getLoader("nrrd");
 
 		setDesiredAspectRatio(1.0);
 	}
@@ -82,7 +81,7 @@ public:
 			info.target = GL_TEXTURE_2D;
 			info.options["nrrd"] = nout;
 
-			Texture* t = nrrdTextureLoader->load(info);
+			Texture* t = textureManager->load(info);
 
 			textures[n] = t;
 
@@ -116,7 +115,6 @@ private:
 	vector<Texture*> textures;
 	int currentSlice;
 	TextureManager* textureManager;
-	TextureLoader* nrrdTextureLoader;
 	//	GLMode2D mode2d;
 	NrrdRange* range;
 public:
