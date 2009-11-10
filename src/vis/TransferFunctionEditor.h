@@ -2,6 +2,7 @@
 #define TRANSFERFUNCTIONEDITOR_H
 
 #include "ibi_qt/ibiQGLViewer.h"
+#include "QtGui/QMenu"
 
 using namespace ibi;
 
@@ -15,6 +16,26 @@ public:
 
 	void init();
 	void draw();
+
+	void keyPressEvent(QKeyEvent *e);
+	void mousePressEvent(QMouseEvent* e);
+
+public slots:
+	void addPointSlot();
+
+protected:
+	void createContextMenu();
+	void createActions();
+
+private:
+	// Context menu
+	QMenu* contextMenu;
+
+	// Actions
+	QAction* addPointAct;
+
+	// Temporary
+	QPoint lastMouseClick;
 
 };
 
