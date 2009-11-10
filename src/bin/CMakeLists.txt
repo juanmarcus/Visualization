@@ -20,6 +20,7 @@ SET (folders
     "query_ray"
     "raycasting"
     "volumeviewer"
+    "txf_editor"
 )
 
 # Parse each subdirectory
