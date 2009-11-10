@@ -1,11 +1,11 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
-#include "RaycastingViewer.h"
+#include "ibi_qt/ibiQRaycastingViewer.h"
 
 using namespace ibi;
 
-class Viewer: public RaycastingViewer
+class Viewer: public ibiQRaycastingViewer
 {
 Q_OBJECT
 

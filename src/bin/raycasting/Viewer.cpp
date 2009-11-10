@@ -4,7 +4,7 @@
 #include <teem/nrrd.h>
 
 Viewer::Viewer(QWidget *parent) :
-	RaycastingViewer(parent)
+	ibiQRaycastingViewer(parent)
 {
 
 }

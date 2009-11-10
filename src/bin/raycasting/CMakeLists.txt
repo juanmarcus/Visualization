@@ -3,7 +3,6 @@ FILE (GLOB sources "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 FILE (GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 
 SET (moc_headers
-    RaycastingViewer.h
     Viewer.h
 )
 
