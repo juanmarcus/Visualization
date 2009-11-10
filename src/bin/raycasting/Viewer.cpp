@@ -22,7 +22,8 @@ void Viewer::initRaycasting()
 	setVolume(volumeTexture);
 
 	// Transfer function
-	textureManager->loadPlugin("../ibi/build/lib/libtexture_loader_transfer_func.so");
+	textureManager->loadPlugin(
+			"../ibi/build/lib/libtexture_loader_transfer_func.so");
 	TextureLoadingInfo txf_info;
 	txf_info.target = GL_TEXTURE_1D;
 	txf_info.texture_type = "transfer_func";
@@ -44,7 +45,7 @@ Texture* Viewer::loadVolume(String filename)
 	if (nrrdLoad(nin, filename.c_str(), NULL))
 	{
 		char* err = biffGetDone(NRRD);
-		throw Exception(err);
+		throw Exception("Viewer.cpp", "Problem loading nrrd.", err);
 	}
 
 	TextureLoadingInfo info;

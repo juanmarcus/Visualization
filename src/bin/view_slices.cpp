@@ -74,7 +74,7 @@ public:
 			Nrrd* slice = nrrdNew();
 			nrrdSlice(slice, nin, axis, n);
 			Nrrd* nout = nrrdNew();
-			nrrdQuantize(nout,slice,range,8);
+			nrrdQuantize(nout, slice, range, 8);
 
 			TextureLoadingInfo info;
 			info.texture_type = "nrrd";
@@ -152,7 +152,8 @@ int main(int argc, char **argv)
 
 	if (axis >= nin->dim)
 	{
-		throw Exception("axis index out of bounds");
+		throw Exception("view_slices.cpp", "Problem setting axis.",
+				"axis index out of bounds.");
 	}
 
 	// Create an application

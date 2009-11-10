@@ -112,7 +112,7 @@ void Viewer::draw()
 		if (nrrdWrap_va(wr, data, nrrdTypeDouble, 1, size))
 		{
 			char * err = biffGetDone(NRRD);
-			throw Exception(err);
+			throw Exception("Viewer.cpp", "Problem wrapping values.", err);
 		}
 
 		// Determine value range
@@ -123,7 +123,7 @@ void Viewer::draw()
 		if (nrrdHistoDraw(dhist, wr, 50, 1, range->max))
 		{
 			char * err = biffGetDone(NRRD);
-			throw Exception(err);
+			throw Exception("Viewer.cpp", "Problem drawing histogram.", err);
 		}
 
 		// Destroy range

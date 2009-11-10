@@ -39,14 +39,14 @@ void Sampler::update()
 	if (gageKindVolumeCheck(gageKindScl, nin))
 	{
 		char* err = biffGetDone(GAGE);
-		fprintf(stderr, "%s: didn't get a %s volume:\n%s\n", me,
-				gageKindScl->name, err);
-		throw Exception(err);
+		//		fprintf(stderr, "%s: didn't get a %s volume:\n%s\n", me,
+		//				gageKindScl->name, err);
+		throw Exception("Sampler.cpp", "Problem setting up sampler.", err);
 	}
 
 	kparm[0] = 1.0; /* scale parameter, in units of samples */
-//	kparm[1] = 0.0; /* B */
-//	kparm[2] = 0.5; /* C */
+	//	kparm[1] = 0.0; /* B */
+	//	kparm[2] = 0.5; /* C */
 
 	ctx = gageContextNew();
 	E = 0;
@@ -56,8 +56,8 @@ void Sampler::update()
 		E |= gagePerVolumeAttach(ctx, pvl);
 	if (!E)
 		E |= gageKernelSet(ctx, gageKernel00, nrrdKernelTent, kparm);
-//	if (!E)
-//		E |= gageKernelSet(ctx, gageKernel11, nrrdKernelBCCubicD, kparm);
+	//	if (!E)
+	//		E |= gageKernelSet(ctx, gageKernel11, nrrdKernelBCCubicD, kparm);
 	if (!E)
 		E |= gageQueryItemOn(ctx, pvl, gageSclValue);
 	if (!E)
@@ -65,8 +65,8 @@ void Sampler::update()
 	if (E)
 	{
 		char* err = biffGetDone(GAGE);
-		fprintf(stderr, "%s: trouble:\n%s\n", me, err);
-		throw Exception(err);
+		//		fprintf(stderr, "%s: trouble:\n%s\n", me, err);
+		throw Exception("Sampler.cpp", "Problem setting up sampler.", err);
 	}
 	result = gageAnswerPointer(ctx, pvl, gageSclValue);
 }
