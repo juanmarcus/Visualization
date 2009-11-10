@@ -22,27 +22,33 @@ void NrrdVolumeViewer::initRaycasting()
 	textureManager->loadPlugin(
 			"../ibi/build/lib/libtexture_loader_transfer_func.so");
 
-	// Prepare loading info for nrrd volume
-	TextureLoadingInfo info;
-	info.target = GL_TEXTURE_3D;
-	info.texture_type = "nrrd3D";
-	info.options["nrrd"] = volume;
+	if (volume)
+	{
+		// Prepare loading info for nrrd volume
+		TextureLoadingInfo info;
+		info.target = GL_TEXTURE_3D;
+		info.texture_type = "nrrd3D";
+		info.options["nrrd"] = volume;
 
-	// Load volume texture
-	Texture* volumeTexture = textureManager->load(info);
+		// Load volume texture
+		Texture* volumeTexture = textureManager->load(info);
 
-	// Set the texture
-	setVolume(volumeTexture);
+		// Set the texture
+		setVolume(volumeTexture);
+	}
 
-	// Prepare transfer function loading info
-	TextureLoadingInfo txf_info;
-	txf_info.target = GL_TEXTURE_1D;
-	txf_info.texture_type = "transfer_func";
-	txf_info.options["filename"] = transfer_function_filename;
+	if (transfer_function_filename != "")
+	{
+		// Prepare transfer function loading info
+		TextureLoadingInfo txf_info;
+		txf_info.target = GL_TEXTURE_1D;
+		txf_info.texture_type = "transfer_func";
+		txf_info.options["filename"] = transfer_function_filename;
 
-	Texture* transfer_function = textureManager->load(txf_info);
+		Texture* transfer_function = textureManager->load(txf_info);
 
-	setTransferFunction(transfer_function);
+		setTransferFunction(transfer_function);
+	}
 }
 
 void NrrdVolumeViewer::setTransferFunctionFilename(String filename)

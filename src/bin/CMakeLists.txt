@@ -19,6 +19,7 @@ ENDFOREACH (cpp_source)
 SET (folders
     "query_ray"
     "raycasting"
+    "volumeviewer"
 )
 
 # Parse each subdirectory
