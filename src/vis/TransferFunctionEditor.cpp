@@ -140,8 +140,7 @@ void TransferFunctionEditor::keyPressEvent(QKeyEvent *e)
 		if (selectedPoint != -1)
 		{
 			Vector3 col = controlPoints[selectedPoint].color;
-			QColor orig;
-			orig.fromRgbF(col.x, col.y, col.z, 1.0);
+			QColor orig = QColor::fromRgbF(col.x, col.y, col.z, 1.0);
 
 			QColor color = QColorDialog::getColor(orig, this);
 			if (color.isValid())
@@ -380,7 +379,27 @@ void TransferFunctionEditor::saveTexture()
 	mode2d.enable();
 	glViewport(0, 0, 512, 4);
 
-	// render!!!!
+	glBegin(GL_QUADS);
+	for (int i = 0; i < controlPoints.size() - 1; ++i)
+	{
+		Vector3 p1 = controlPoints[i].point;
+		Vector3 c1 = controlPoints[i].color;
+		Vector3 p2 = controlPoints[i + 1].point;
+		Vector3 c2 = controlPoints[i + 1].color;
+
+		glColor4f(c1.x, c1.y, c1.z, p1.y);
+		glVertex2f(p1.x, 0);
+
+		glColor4f(c2.x, c2.y, c2.z, p2.y);
+		glVertex2f(p2.x, 0);
+
+		glColor4f(c2.x, c2.y, c2.z, p2.y);
+		glVertex2f(p2.x, 4);
+
+		glColor4f(c1.x, c1.y, c1.z, p1.y);
+		glVertex2f(p1.x, 4);
+	}
+	glEnd();
 
 	// Stop rendering
 	mode2d.disable();
