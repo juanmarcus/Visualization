@@ -143,6 +143,25 @@ void TransferFunctionEditor::keyPressEvent(QKeyEvent *e)
 			handled = true;
 		}
 	}
+	else if ((e->key() == Qt::Key_Delete) && (modifiers == Qt::NoButton))
+	{
+		if (selectedPoint != -1)
+		{
+			std::vector<ControlPoint>::iterator it = controlPoints.begin();
+			std::vector<ControlPoint>::iterator itEnd = controlPoints.end();
+			for (int i = 0; it != itEnd; ++it, ++i)
+			{
+				if (i == selectedPoint)
+				{
+					controlPoints.erase(it);
+					break;
+				}
+			}
+			selectedPoint = -1;
+			handled = true;
+			updateGL();
+		}
+	}
 
 	if (!handled)
 		QGLViewer::keyPressEvent(e);
