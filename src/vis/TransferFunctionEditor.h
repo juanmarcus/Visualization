@@ -27,15 +27,11 @@ protected slots:
 	void addPointSlot();
 
 protected:
-	void createContextMenu();
 	void createActions();
 
 private:
 	// GeometryDrawer
 	GeometryDrawer2D geometryDrawer2d;
-
-	// Context menu
-	QMenu* contextMenu;
 
 	// Actions
 	QAction* addPointAct;
@@ -43,7 +39,8 @@ private:
 	// Temporary
 	QPoint lastMouseClick;
 
-	std::list<Vector3> controlPoints;
+	std::vector<Vector3> controlPoints;
+	int selectedPoint;
 
 };
 
