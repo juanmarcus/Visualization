@@ -2,7 +2,11 @@
 
 #include <algorithm>
 #include "QtGui/QColorDialog"
+#include "QtGui/QFileDialog"
 #include "QtGui/QKeyEvent"
+#include <fstream>
+
+using namespace std;
 
 TransferFunctionEditor::TransferFunctionEditor(QWidget *parent) :
 	ibiQGLViewer(parent), selectedPoint(-1)
@@ -49,7 +53,7 @@ void TransferFunctionEditor::draw()
 	glEnd();
 
 	// Convert points to screen
-	std::vector<Vector3> points;
+	vector<Vector3> points;
 	for (int i = 0; i < controlPoints.size(); ++i)
 	{
 		Vector3 vec = controlPoints[i].point;
@@ -94,15 +98,8 @@ void TransferFunctionEditor::draw()
 	{
 		Vector3 p1 = points[i];
 		Vector3 p2 = points[i + 1];
-		Vector3 c1;
-		c1.x = controlPoints[i].color.redF();
-		c1.y = controlPoints[i].color.greenF();
-		c1.z = controlPoints[i].color.blueF();
-
-		Vector3 c2;
-		c2.x = controlPoints[i + 1].color.redF();
-		c2.y = controlPoints[i + 1].color.greenF();
-		c2.z = controlPoints[i + 1].color.blueF();
+		Vector3 c1 = controlPoints[i].color;
+		Vector3 c2 = controlPoints[i + 1].color;
 
 		glColor3f(c1.x, c1.y, c1.z);
 		glVertex2f(p1.x, 0);
@@ -134,10 +131,17 @@ void TransferFunctionEditor::keyPressEvent(QKeyEvent *e)
 	{
 		if (selectedPoint != -1)
 		{
-			QColor color = QColorDialog::getColor(controlPoints[selectedPoint].color, this);
+			Vector3 col = controlPoints[selectedPoint].color;
+			QColor orig;
+			orig.fromRgbF(col.x, col.y, col.z, 1.0);
+
+			QColor color = QColorDialog::getColor(orig, this);
 			if (color.isValid())
 			{
-				controlPoints[selectedPoint].color = color;
+				col.x = color.redF();
+				col.y = color.greenF();
+				col.z = color.blueF();
+				controlPoints[selectedPoint].color = col;
 			}
 			handled = true;
 		}
@@ -146,8 +150,8 @@ void TransferFunctionEditor::keyPressEvent(QKeyEvent *e)
 	{
 		if (selectedPoint != -1)
 		{
-			std::vector<ControlPoint>::iterator it = controlPoints.begin();
-			std::vector<ControlPoint>::iterator itEnd = controlPoints.end();
+			vector<ControlPoint>::iterator it = controlPoints.begin();
+			vector<ControlPoint>::iterator itEnd = controlPoints.end();
 			for (int i = 0; it != itEnd; ++it, ++i)
 			{
 				if (i == selectedPoint)
@@ -211,6 +215,11 @@ void TransferFunctionEditor::keyPressEvent(QKeyEvent *e)
 		controlPoints.clear();
 		handled = true;
 	}
+	else if ((e->key() == Qt::Key_S) && (modifiers == Qt::ControlModifier))
+	{
+		saveTextureDescription();
+		handled = true;
+	}
 
 	if (handled)
 	{
@@ -270,6 +279,27 @@ void TransferFunctionEditor::mousePressEvent(QMouseEvent* e)
 	}
 }
 
+void TransferFunctionEditor::saveTextureDescription()
+{
+	QString filename = QFileDialog::getSaveFileName(this, "Save", ".", "*.txt");
+	if (!filename.isEmpty())
+	{
+		ofstream out(filename.toStdString().c_str());
+
+		if (out.is_open())
+		{
+			for (int i = 0; i < controlPoints.size(); ++i)
+			{
+				Vector3 point = controlPoints[i].point;
+				Vector3 color = controlPoints[i].color;
+				// write point
+				// write color
+			}
+			out.close();
+		}
+	}
+}
+
 bool comp(ControlPoint p1, ControlPoint p2)
 {
 	return (p1.point.x <= p2.point.x);
@@ -287,7 +317,7 @@ void TransferFunctionEditor::addPointSlot()
 	}
 
 	controlPoints.push_back(ControlPoint(point));
-	std::sort(controlPoints.begin(), controlPoints.end(), comp);
+	sort(controlPoints.begin(), controlPoints.end(), comp);
 	selectedPoint = -1;
 	updateGL();
 }

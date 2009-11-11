@@ -14,10 +14,10 @@ struct ControlPoint
 	ControlPoint(Vector3& a_point)
 	{
 		point = a_point;
-		color = Qt::black;
+		color = Vector3::ZERO;
 	}
 	Vector3 point;
-	QColor color;
+	Vector3 color;
 };
 
 class TransferFunctionEditor: public ibiQGLViewer
@@ -33,6 +33,8 @@ public:
 
 	void keyPressEvent(QKeyEvent *e);
 	void mousePressEvent(QMouseEvent* e);
+public slots:
+	void saveTextureDescription();
 
 protected slots:
 	void addPointSlot();
