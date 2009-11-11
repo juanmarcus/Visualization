@@ -220,6 +220,11 @@ void TransferFunctionEditor::keyPressEvent(QKeyEvent *e)
 		saveTextureDescription();
 		handled = true;
 	}
+	else if ((e->key() == Qt::Key_O) && (modifiers == Qt::ControlModifier))
+	{
+		loadTextureDescription();
+		handled = true;
+	}
 
 	if (handled)
 	{
@@ -279,6 +284,36 @@ void TransferFunctionEditor::mousePressEvent(QMouseEvent* e)
 	}
 }
 
+void TransferFunctionEditor::loadTextureDescription()
+{
+	QString filename = QFileDialog::getOpenFileName(this, "Open", ".", "*.txt");
+	if (!filename.isEmpty())
+	{
+		ifstream in(filename.toStdString().c_str());
+
+		if (in.is_open())
+		{
+			controlPoints.clear();
+
+			int size;
+			in >> size;
+			for (int i = 0; i < size; ++i)
+			{
+				Vector3 point;
+				Vector3 color;
+				in >> point.x;
+				in >> point.y;
+				in >> point.z;
+				in >> color.x;
+				in >> color.y;
+				in >> color.z;
+				controlPoints.push_back(ControlPoint(point, color));
+			}
+			in.close();
+		}
+	}
+}
+
 void TransferFunctionEditor::saveTextureDescription()
 {
 	QString filename = QFileDialog::getSaveFileName(this, "Save", ".", "*.txt");
@@ -288,12 +323,13 @@ void TransferFunctionEditor::saveTextureDescription()
 
 		if (out.is_open())
 		{
+			out << controlPoints.size() << "\n";
 			for (int i = 0; i < controlPoints.size(); ++i)
 			{
 				Vector3 point = controlPoints[i].point;
 				Vector3 color = controlPoints[i].color;
-				// write point
-				// write color
+				out << point.x << " " << point.y << " " << point.z << "\n";
+				out << color.x << " " << color.y << " " << color.z << "\n";
 			}
 			out.close();
 		}

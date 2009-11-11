@@ -11,10 +11,10 @@ using namespace ibi;
 
 struct ControlPoint
 {
-	ControlPoint(Vector3& a_point)
+	ControlPoint(const Vector3& a_point, const Vector3& a_color = Vector3::ZERO)
 	{
 		point = a_point;
-		color = Vector3::ZERO;
+		color = a_color;
 	}
 	Vector3 point;
 	Vector3 color;
@@ -35,6 +35,7 @@ public:
 	void mousePressEvent(QMouseEvent* e);
 public slots:
 	void saveTextureDescription();
+	void loadTextureDescription();
 
 protected slots:
 	void addPointSlot();
