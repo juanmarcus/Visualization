@@ -64,9 +64,12 @@ void TransferFunctionEditor::keyPressEvent(QKeyEvent *e)
 		if (selectedPoint != -1)
 		{
 			QColor color = QColorDialog::getColor(Qt::black, this);
-			controlPoints[selectedPoint].color = color;
+			if (color.isValid())
+			{
+				controlPoints[selectedPoint].color = color;
+				updateGL();
+			}
 			handled = true;
-			updateGL();
 		}
 	}
 
