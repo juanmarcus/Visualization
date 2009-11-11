@@ -2,6 +2,9 @@
 #define TRANSFERFUNCTIONEDITOR_H
 
 #include "ibi_qt/ibiQGLViewer.h"
+#include <list>
+#include "ibi_geometry/Vector3.h"
+#include "ibi_gl/GeometryDrawer.h"
 #include "QtGui/QMenu"
 
 using namespace ibi;
@@ -20,7 +23,7 @@ public:
 	void keyPressEvent(QKeyEvent *e);
 	void mousePressEvent(QMouseEvent* e);
 
-public slots:
+protected slots:
 	void addPointSlot();
 
 protected:
@@ -28,6 +31,9 @@ protected:
 	void createActions();
 
 private:
+	// GeometryDrawer
+	GeometryDrawer geometryDrawer;
+
 	// Context menu
 	QMenu* contextMenu;
 
@@ -36,6 +42,8 @@ private:
 
 	// Temporary
 	QPoint lastMouseClick;
+
+	std::list<Vector3> controlPoints;
 
 };
 

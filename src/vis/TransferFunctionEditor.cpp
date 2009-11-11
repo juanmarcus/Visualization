@@ -35,7 +35,19 @@ void TransferFunctionEditor::draw()
 {
 	start2DMode();
 
+	glColor3f(1.0, 1.0, 1.0);
 	drawFullScreenQuad();
+
+	std::list<Vector3>::iterator it = controlPoints.begin();
+	std::list<Vector3>::iterator itEnd = controlPoints.end();
+
+	glColor3f(0.0, 0.0, 0.0);
+	for (; it != itEnd; ++it)
+	{
+		Vector3 point = absoluteViewportCoordinates(*it);
+		std::cout << point << std::endl;
+		geometryDrawer.drawPoint(point, 1.0, 12);
+	}
 
 	stop2DMode();
 }
@@ -45,9 +57,6 @@ void TransferFunctionEditor::keyPressEvent(QKeyEvent *e)
 	// Get event modifiers key
 	const Qt::KeyboardModifiers modifiers = e->modifiers();
 
-	// A simple switch on e->key() is not sufficient if we want to take state key into account.
-	// With a switch, it would have been impossible to separate 'F' from 'CTRL+F'.
-	// That's why we use imbricated if...else and a "handled" boolean.
 	bool handled = false;
 	//	if ((e->key() == Qt::Key_W) && (modifiers == Qt::NoButton))
 	//	{
@@ -63,13 +72,8 @@ void TransferFunctionEditor::mousePressEvent(QMouseEvent* e)
 {
 	if ((e->button() == Qt::RightButton) && (e->modifiers() == Qt::NoButton))
 	{
-		lastMouseClick = e->globalPos();
+		lastMouseClick = e->pos();
 		QAction* action = contextMenu->exec(e->globalPos());
-
-		//		if (action)
-		//		{
-		//			action->trigger();
-		//		}
 	}
 	else
 		QGLViewer::mousePressEvent(e);
@@ -77,5 +81,8 @@ void TransferFunctionEditor::mousePressEvent(QMouseEvent* e)
 
 void TransferFunctionEditor::addPointSlot()
 {
-	std::cout << lastMouseClick.x() << std::endl;
+	Vector3 point = normalizedViewportCoordinates(lastMouseClick.x(),
+			lastMouseClick.y());
+	controlPoints.push_back(point);
+	updateGL();
 }
