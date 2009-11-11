@@ -63,14 +63,48 @@ void TransferFunctionEditor::draw()
 	glColor3f(0.0, 0.0, 0.0);
 
 	glBegin(GL_LINE_STRIP);
-	glVertex2f(0, 0);
 	for (int i = 0; i < points.size(); ++i)
 	{
 		Vector3 point = points[i];
 		//			geometryDrawer2d.drawCircle(point, 5);
 		glVertex2f(point.x, point.y);
 	}
-	//last vertex based on viewport
+	glEnd();
+
+	int viewportMiddle = 200;
+
+	// Draw colors
+	glBegin(GL_QUADS);
+	int max = points.size() - 1;
+	for (int i = 0; i < max; ++i)
+	{
+		Vector3 p1 = points[i];
+		Vector3 p2 = points[i + 1];
+		Vector3 c1;
+		c1.x = controlPoints[i].color.redF();
+		c1.y = controlPoints[i].color.greenF();
+		c1.z = controlPoints[i].color.blueF();
+
+		Vector3 c2;
+		c2.x = controlPoints[i + 1].color.redF();
+		c2.y = controlPoints[i + 1].color.greenF();
+		c2.z = controlPoints[i + 1].color.blueF();
+
+		glColor3f(c1.x, c1.y, c1.z);
+		glVertex2f(p1.x, 0);
+
+		glColor3f(c2.x, c2.y, c2.z);
+		glVertex2f(p2.x, 0);
+
+		glColor3f(c2.x, c2.y, c2.z);
+		glVertex2f(p2.x, viewportMiddle);
+
+		glColor3f(c1.x, c1.y, c1.z);
+		glVertex2f(p1.x, viewportMiddle);
+
+		// for each line between two points
+		// interpolate color and draw
+	}
 	glEnd();
 
 	stop2DMode();
