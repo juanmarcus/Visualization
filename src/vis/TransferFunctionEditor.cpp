@@ -46,7 +46,7 @@ void TransferFunctionEditor::draw()
 	{
 		Vector3 point = absoluteViewportCoordinates(*it);
 		std::cout << point << std::endl;
-		geometryDrawer.drawPoint(point, 1.0, 12);
+		geometryDrawer2d.drawCircle(point, 10);
 	}
 
 	stop2DMode();

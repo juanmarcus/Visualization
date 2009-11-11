@@ -4,7 +4,7 @@
 #include "ibi_qt/ibiQGLViewer.h"
 #include <list>
 #include "ibi_geometry/Vector3.h"
-#include "ibi_gl/GeometryDrawer.h"
+#include "ibi_gl/GeometryDrawer2D.h"
 #include "QtGui/QMenu"
 
 using namespace ibi;
@@ -32,7 +32,7 @@ protected:
 
 private:
 	// GeometryDrawer
-	GeometryDrawer geometryDrawer;
+	GeometryDrawer2D geometryDrawer2d;
 
 	// Context menu
 	QMenu* contextMenu;
