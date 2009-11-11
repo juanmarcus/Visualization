@@ -350,6 +350,8 @@ void TransferFunctionEditor::saveTextureDescription()
 
 void TransferFunctionEditor::saveTexture()
 {
+	int textureWidth = 512;
+
 	// May be needed
 	makeCurrent();
 
@@ -357,7 +359,7 @@ void TransferFunctionEditor::saveTexture()
 	TextureLoadingInfo info;
 	info.texture_type = "empty";
 	info.target = GL_TEXTURE_2D;
-	info.options["width"] = 512;
+	info.options["width"] = textureWidth;
 	info.options["height"] = 4;
 	info.options["internalformat"] = GL_RGBA;
 	info.options["format"] = GL_RGBA;
@@ -368,7 +370,7 @@ void TransferFunctionEditor::saveTexture()
 
 	// 2D mode
 	GLMode2D mode2d;
-	mode2d.setScreenDimensions(512, 4);
+	mode2d.setScreenDimensions(textureWidth, 4);
 
 	saveViewport();
 
@@ -377,7 +379,12 @@ void TransferFunctionEditor::saveTexture()
 	framebuffer.enable();
 	framebuffer.beginRender();
 	mode2d.enable();
-	glViewport(0, 0, 512, 4);
+	glViewport(0, 0, textureWidth, 4);
+
+	Vector3 pi = controlPoints[0].point;
+	Vector3 pf = controlPoints[controlPoints.size() - 1].point;
+
+	float dx = pf.x - pi.x;
 
 	glBegin(GL_QUADS);
 	for (int i = 0; i < controlPoints.size() - 1; ++i)
@@ -387,17 +394,20 @@ void TransferFunctionEditor::saveTexture()
 		Vector3 p2 = controlPoints[i + 1].point;
 		Vector3 c2 = controlPoints[i + 1].color;
 
-		glColor4f(c1.x, c1.y, c1.z, p1.y);
-		glVertex2f(p1.x, 0);
-
-		glColor4f(c2.x, c2.y, c2.z, p2.y);
-		glVertex2f(p2.x, 0);
-
-		glColor4f(c2.x, c2.y, c2.z, p2.y);
-		glVertex2f(p2.x, 4);
+		float x1 = ((p1.x - pi.x) / dx) * 512;
+		float x2 = ((p2.x - pi.x) / dx) * 512;
 
 		glColor4f(c1.x, c1.y, c1.z, p1.y);
-		glVertex2f(p1.x, 4);
+		glVertex2f(x1, 0);
+
+		glColor4f(c2.x, c2.y, c2.z, p2.y);
+		glVertex2f(x2, 0);
+
+		glColor4f(c2.x, c2.y, c2.z, p2.y);
+		glVertex2f(x2, 4);
+
+		glColor4f(c1.x, c1.y, c1.z, p1.y);
+		glVertex2f(x1, 4);
 	}
 	glEnd();
 
