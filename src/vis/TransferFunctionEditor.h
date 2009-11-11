@@ -5,7 +5,6 @@
 #include <list>
 #include "ibi_gl/Texture.h"
 #include "ibi_texturemanager/TextureManager.h"
-#include "ibi_framebuffer/Framebuffer.h"
 #include "ibi_geometry/Vector3.h"
 #include "ibi_gl/GeometryDrawer2D.h"
 #include "QtGui/QMenu"
@@ -48,9 +47,6 @@ protected:
 	void createActions();
 
 private:
-	// Texture manager
-	TextureManager* textureManager;
-
 	// GeometryDrawer
 	GeometryDrawer2D geometryDrawer2d;
 
@@ -60,9 +56,6 @@ private:
 	// Temporary
 	QPoint lastMouseClick;
 	int selectedPoint;
-
-	// Framebuffer
-	Framebuffer framebuffer;
 
 	// Transfer function data
 	std::vector<ControlPoint> controlPoints;

@@ -4,6 +4,7 @@
 #include "QtGui/QColorDialog"
 #include "QtGui/QFileDialog"
 #include "QtGui/QKeyEvent"
+#include "QtOpenGL/QGLFramebufferObject"
 #include <fstream>
 
 using namespace std;
@@ -28,14 +29,7 @@ void TransferFunctionEditor::createActions()
 void TransferFunctionEditor::init()
 {
 	// Init glew
-	glewInit();
-
-	// Initialize texture manager and plugins
-	textureManager = TextureManager::getInstance();
-	textureManager->loadPlugin("../ibi/build/lib/libtexture_loader_empty.so");
-
-	// Initialize the framebuffer
-	framebuffer.init();
+	//	glewInit();
 
 	setDesiredAspectRatio(4.0);
 }
@@ -350,80 +344,76 @@ void TransferFunctionEditor::saveTextureDescription()
 
 void TransferFunctionEditor::saveTexture()
 {
-	int textureWidth = 512;
-
-	// May be needed
-	makeCurrent();
-
-	// Render target info
-	TextureLoadingInfo info;
-	info.texture_type = "empty";
-	info.target = GL_TEXTURE_2D;
-	info.options["width"] = textureWidth;
-	info.options["height"] = 4;
-	info.options["internalformat"] = GL_RGBA;
-	info.options["format"] = GL_RGBA;
-	info.options["type"] = GL_FLOAT;
-
-	// Load the target texture
-	Texture* renderTarget = textureManager->load(info);
-
-	// 2D mode
-	GLMode2D mode2d;
-	mode2d.setScreenDimensions(textureWidth, 4);
-
-	saveViewport();
-
-	// Create the framebuffer and start rendering
-	framebuffer.setTarget(renderTarget);
-	framebuffer.enable();
-	framebuffer.beginRender();
-	mode2d.enable();
-	glViewport(0, 0, textureWidth, 4);
-
-	Vector3 pi = controlPoints[0].point;
-	Vector3 pf = controlPoints[controlPoints.size() - 1].point;
-
-	float dx = pf.x - pi.x;
-
-	glBegin(GL_QUADS);
-	for (int i = 0; i < controlPoints.size() - 1; ++i)
+	QString filename = QFileDialog::getSaveFileName(this, "Save", ".", "*.png");
+	if (!filename.isEmpty())
 	{
-		Vector3 p1 = controlPoints[i].point;
-		Vector3 c1 = controlPoints[i].color;
-		Vector3 p2 = controlPoints[i + 1].point;
-		Vector3 c2 = controlPoints[i + 1].color;
 
-		float x1 = ((p1.x - pi.x) / dx) * 512;
-		float x2 = ((p2.x - pi.x) / dx) * 512;
+		int textureWidth = 512;
 
-		glColor4f(c1.x, c1.y, c1.z, p1.y);
-		glVertex2f(x1, 0);
+		// May be needed
+		makeCurrent();
 
-		glColor4f(c2.x, c2.y, c2.z, p2.y);
-		glVertex2f(x2, 0);
+		// 2D mode
+		GLMode2D mode2d;
+		mode2d.setScreenDimensions(textureWidth, 4);
 
-		glColor4f(c2.x, c2.y, c2.z, p2.y);
-		glVertex2f(x2, 4);
+		saveViewport();
 
-		glColor4f(c1.x, c1.y, c1.z, p1.y);
-		glVertex2f(x1, 4);
+		// Create the framebuffer and start rendering
+		QGLFramebufferObject framebuffer(textureWidth, 4, GL_TEXTURE_2D);
+		framebuffer.bind();
+		mode2d.enable();
+		glViewport(0, 0, textureWidth, 4);
+
+		Vector3 pi = controlPoints[0].point;
+		Vector3 pf = controlPoints[controlPoints.size() - 1].point;
+
+		float dx = pf.x - pi.x;
+
+		glBegin(GL_QUADS);
+		for (int i = 0; i < controlPoints.size() - 1; ++i)
+		{
+			Vector3 p1 = controlPoints[i].point;
+			Vector3 c1 = controlPoints[i].color;
+			Vector3 p2 = controlPoints[i + 1].point;
+			Vector3 c2 = controlPoints[i + 1].color;
+
+			float x1 = ((p1.x - pi.x) / dx) * textureWidth;
+			float x2 = ((p2.x - pi.x) / dx) * textureWidth;
+
+			glColor4f(c1.x, c1.y, c1.z, p1.y);
+			glVertex2f(x1, 0);
+
+			glColor4f(c2.x, c2.y, c2.z, p2.y);
+			glVertex2f(x2, 0);
+
+			glColor4f(c2.x, c2.y, c2.z, p2.y);
+			glVertex2f(x2, 4);
+
+			glColor4f(c1.x, c1.y, c1.z, p1.y);
+			glVertex2f(x1, 4);
+		}
+		glEnd();
+
+		// Stop rendering
+		mode2d.disable();
+		framebuffer.release();
+
+		//read pixels from bottom line
+
+		QImage image = framebuffer.toImage();
+		if (image.hasAlphaChannel())
+		{
+			cout << "fucking has!!\n";
+		}else {
+			cout << "damn!!\n";
+		}
+		image.save(filename,"png",100);
+		//save the new texture to a file
+
+		restoreViewport();
+		updateGL();
 	}
-	glEnd();
-
-	// Stop rendering
-	mode2d.disable();
-	framebuffer.endRender();
-	framebuffer.disable();
-
-	// Read pixels from bottom line
-	// save the new texture
-
-	delete renderTarget;
-
-	restoreViewport();
-	updateGL();
-
 }
 
 bool comp(ControlPoint p1, ControlPoint p2)
