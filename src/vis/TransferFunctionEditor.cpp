@@ -27,6 +27,16 @@ void TransferFunctionEditor::createActions()
 
 void TransferFunctionEditor::init()
 {
+	// Init glew
+	glewInit();
+
+	// Initialize texture manager and plugins
+	textureManager = TextureManager::getInstance();
+	textureManager->loadPlugin("../ibi/build/lib/libtexture_loader_empty.so");
+
+	// Initialize the framebuffer
+	framebuffer.init();
+
 	setDesiredAspectRatio(4.0);
 }
 
@@ -113,8 +123,6 @@ void TransferFunctionEditor::draw()
 		glColor3f(c1.x, c1.y, c1.z);
 		glVertex2f(p1.x, viewportMiddle);
 
-		// for each line between two points
-		// interpolate color and draw
 	}
 	glEnd();
 
@@ -218,6 +226,11 @@ void TransferFunctionEditor::keyPressEvent(QKeyEvent *e)
 	else if ((e->key() == Qt::Key_S) && (modifiers == Qt::ControlModifier))
 	{
 		saveTextureDescription();
+		handled = true;
+	}
+	else if ((e->key() == Qt::Key_T) && (modifiers == Qt::ControlModifier))
+	{
+		saveTexture();
 		handled = true;
 	}
 	else if ((e->key() == Qt::Key_O) && (modifiers == Qt::ControlModifier))
@@ -334,6 +347,54 @@ void TransferFunctionEditor::saveTextureDescription()
 			out.close();
 		}
 	}
+}
+
+void TransferFunctionEditor::saveTexture()
+{
+	// May be needed
+	makeCurrent();
+
+	// Render target info
+	TextureLoadingInfo info;
+	info.texture_type = "empty";
+	info.target = GL_TEXTURE_2D;
+	info.options["width"] = 512;
+	info.options["height"] = 4;
+	info.options["internalformat"] = GL_RGBA;
+	info.options["format"] = GL_RGBA;
+	info.options["type"] = GL_FLOAT;
+
+	// Load the target texture
+	Texture* renderTarget = textureManager->load(info);
+
+	// 2D mode
+	GLMode2D mode2d;
+	mode2d.setScreenDimensions(512, 4);
+
+	saveViewport();
+
+	// Create the framebuffer and start rendering
+	framebuffer.setTarget(renderTarget);
+	framebuffer.enable();
+	framebuffer.beginRender();
+	mode2d.enable();
+	glViewport(0, 0, 512, 4);
+
+	// render!!!!
+
+	// Stop rendering
+	mode2d.disable();
+	framebuffer.endRender();
+	framebuffer.disable();
+
+	// Read pixels from bottom line
+	// save the new texture
+
+	delete renderTarget;
+
+	restoreViewport();
+	updateGL();
+
 }
 
 bool comp(ControlPoint p1, ControlPoint p2)

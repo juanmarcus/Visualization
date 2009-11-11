@@ -3,6 +3,9 @@
 
 #include "ibi_qt/ibiQGLViewer.h"
 #include <list>
+#include "ibi_gl/Texture.h"
+#include "ibi_texturemanager/TextureManager.h"
+#include "ibi_framebuffer/Framebuffer.h"
 #include "ibi_geometry/Vector3.h"
 #include "ibi_gl/GeometryDrawer2D.h"
 #include "QtGui/QMenu"
@@ -36,6 +39,7 @@ public:
 public slots:
 	void saveTextureDescription();
 	void loadTextureDescription();
+	void saveTexture();
 
 protected slots:
 	void addPointSlot();
@@ -44,6 +48,9 @@ protected:
 	void createActions();
 
 private:
+	// Texture manager
+	TextureManager* textureManager;
+
 	// GeometryDrawer
 	GeometryDrawer2D geometryDrawer2d;
 
@@ -52,9 +59,13 @@ private:
 
 	// Temporary
 	QPoint lastMouseClick;
-
-	std::vector<ControlPoint> controlPoints;
 	int selectedPoint;
+
+	// Framebuffer
+	Framebuffer framebuffer;
+
+	// Transfer function data
+	std::vector<ControlPoint> controlPoints;
 
 };
 
