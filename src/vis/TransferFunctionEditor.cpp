@@ -30,33 +30,32 @@ void TransferFunctionEditor::draw()
 {
 	start2DMode();
 
+	// Read viewport size
+	int vPort[4];
+	glGetIntegerv(GL_VIEWPORT, vPort);
+	int viewportMiddle = vPort[3] / 2;
+	int viewportTop = vPort[3];
+	int viewportWidth = vPort[2];
+
+	// Draw a white working area
 	glColor3f(1.0, 1.0, 1.0);
 	drawFullScreenQuad();
+
+	// Draw a division
+	glColor3f(0.0, 0.0, 0.0);
+	glBegin(GL_LINES);
+	glVertex2f(0, viewportMiddle);
+	glVertex2f(viewportWidth, viewportMiddle);
+	glEnd();
 
 	// Convert points to screen
 	std::vector<Vector3> points;
 	for (int i = 0; i < controlPoints.size(); ++i)
 	{
 		Vector3 vec = controlPoints[i].point;
+		vec.y = (vec.y / 2) + 0.5;
 		Vector3 point = absoluteViewportCoordinates(vec);
 		points.push_back(point);
-	}
-
-	// Draw points
-	glColor3f(0.3, 0.3, 0.3);
-	for (int i = 0; i < points.size(); ++i)
-	{
-		Vector3 point = points[i];
-		if (i == selectedPoint)
-		{
-			glColor3f(0.0, 0.0, 0.0);
-			geometryDrawer2d.drawCircle(point, 5);
-			glColor3f(0.3, 0.3, 0.3);
-		}
-		else
-		{
-			geometryDrawer2d.drawCircle(point, 5);
-		}
 	}
 
 	// Draw opacity lines
@@ -71,7 +70,22 @@ void TransferFunctionEditor::draw()
 	}
 	glEnd();
 
-	int viewportMiddle = 200;
+	// Draw points
+	glColor3f(0.0, 0.0, 0.0);
+	for (int i = 0; i < points.size(); ++i)
+	{
+		Vector3 point = points[i];
+		if (i == selectedPoint)
+		{
+			glColor3f(1.0, 0.0, 1.0);
+			geometryDrawer2d.drawCircle(point, 5);
+			glColor3f(0.0, 0.0, 0.0);
+		}
+		else
+		{
+			geometryDrawer2d.drawCircle(point, 5);
+		}
+	}
 
 	// Draw colors
 	glBegin(GL_QUADS);
@@ -191,6 +205,13 @@ void TransferFunctionEditor::addPointSlot()
 {
 	Vector3 point = normalizedViewportCoordinates(lastMouseClick.x(),
 			lastMouseClick.y());
+	point.y = (point.y - 0.5) * 2;
+
+	if (point.x < 0.0 || point.x > 1.0 || point.y < 0.0 || point.y > 1.0)
+	{
+		return;
+	}
+
 	controlPoints.push_back(ControlPoint(point));
 	std::sort(controlPoints.begin(), controlPoints.end(), comp);
 	selectedPoint = -1;
