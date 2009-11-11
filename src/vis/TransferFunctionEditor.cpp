@@ -134,11 +134,10 @@ void TransferFunctionEditor::keyPressEvent(QKeyEvent *e)
 	{
 		if (selectedPoint != -1)
 		{
-			QColor color = QColorDialog::getColor(Qt::black, this);
+			QColor color = QColorDialog::getColor(controlPoints[selectedPoint].color, this);
 			if (color.isValid())
 			{
 				controlPoints[selectedPoint].color = color;
-				updateGL();
 			}
 			handled = true;
 		}
@@ -159,12 +158,68 @@ void TransferFunctionEditor::keyPressEvent(QKeyEvent *e)
 			}
 			selectedPoint = -1;
 			handled = true;
-			updateGL();
 		}
 	}
+	else if ((e->key() == Qt::Key_Up) && (modifiers == Qt::ShiftModifier))
+	{
+		if (selectedPoint != -1)
+		{
+			Vector3 point = controlPoints[selectedPoint].point;
+			point.y += 0.01;
+			if (point.y > 1.0)
+			{
+				point.y = 1.0;
+			}
+			controlPoints[selectedPoint].point = point;
+			handled = true;
+		}
+	}
+	else if ((e->key() == Qt::Key_Down) && (modifiers == Qt::ShiftModifier))
+	{
+		if (selectedPoint != -1)
+		{
+			Vector3 point = controlPoints[selectedPoint].point;
+			point.y -= 0.01;
+			if (point.y < 0.0)
+			{
+				point.y = 0.0;
+			}
+			controlPoints[selectedPoint].point = point;
+			handled = true;
+		}
+	}
+	else if ((e->key() == Qt::Key_Left) && (modifiers == Qt::NoButton))
+	{
+		selectedPoint -= 1;
+		if (selectedPoint < 0)
+		{
+			selectedPoint = 0;
+		}
+		handled = true;
+	}
+	else if ((e->key() == Qt::Key_Right) && (modifiers == Qt::NoButton))
+	{
+		selectedPoint += 1;
+		if (selectedPoint >= controlPoints.size())
+		{
+			selectedPoint = controlPoints.size() - 1;
+		}
+		handled = true;
+	}
+	else if ((e->key() == Qt::Key_L) && (modifiers == Qt::ControlModifier))
+	{
+		controlPoints.clear();
+		handled = true;
+	}
 
-	if (!handled)
+	if (handled)
+	{
+		updateGL();
+	}
+	else
+	{
 		QGLViewer::keyPressEvent(e);
+	}
 }
 
 void TransferFunctionEditor::mousePressEvent(QMouseEvent* e)
