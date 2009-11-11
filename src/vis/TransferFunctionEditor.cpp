@@ -28,7 +28,7 @@ void TransferFunctionEditor::createActions()
 
 void TransferFunctionEditor::init()
 {
-	setDesiredAspectRatio(2.0);
+	setDesiredAspectRatio(4.0);
 }
 
 void TransferFunctionEditor::draw()
@@ -45,8 +45,7 @@ void TransferFunctionEditor::draw()
 	for (; it != itEnd; ++it)
 	{
 		Vector3 point = absoluteViewportCoordinates(*it);
-		std::cout << point << std::endl;
-		geometryDrawer2d.drawCircle(point, 10);
+		geometryDrawer2d.drawCircle(point, 5);
 	}
 
 	stop2DMode();
