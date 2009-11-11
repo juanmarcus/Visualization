@@ -344,6 +344,11 @@ void TransferFunctionEditor::saveTextureDescription()
 
 void TransferFunctionEditor::saveTexture()
 {
+	if (controlPoints.size() < 2)
+	{
+		return;
+	}
+
 	QString filename = QFileDialog::getSaveFileName(this, "Save", ".", "*.png");
 	if (!filename.isEmpty())
 	{
@@ -405,10 +410,12 @@ void TransferFunctionEditor::saveTexture()
 		if (image.hasAlphaChannel())
 		{
 			cout << "fucking has!!\n";
-		}else {
+		}
+		else
+		{
 			cout << "damn!!\n";
 		}
-		image.save(filename,"png",100);
+		image.save(filename, "png", 100);
 		//save the new texture to a file
 
 		restoreViewport();
