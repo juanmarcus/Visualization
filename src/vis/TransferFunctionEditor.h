@@ -9,6 +9,17 @@
 
 using namespace ibi;
 
+struct ControlPoint
+{
+	ControlPoint(Vector3& a_point)
+	{
+		point = a_point;
+		color = Qt::black;
+	}
+	Vector3 point;
+	QColor color;
+};
+
 class TransferFunctionEditor: public ibiQGLViewer
 {
 Q_OBJECT
@@ -39,7 +50,7 @@ private:
 	// Temporary
 	QPoint lastMouseClick;
 
-	std::vector<Vector3> controlPoints;
+	std::vector<ControlPoint> controlPoints;
 	int selectedPoint;
 
 };

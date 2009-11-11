@@ -1,6 +1,7 @@
 #include "TransferFunctionEditor.h"
 
 #include <algorithm>
+#include "QtGui/QColorDialog"
 #include "QtGui/QKeyEvent"
 
 TransferFunctionEditor::TransferFunctionEditor(QWidget *parent) :
@@ -35,7 +36,7 @@ void TransferFunctionEditor::draw()
 	glColor3f(0.3, 0.3, 0.3);
 	for (int i = 0; i < controlPoints.size(); ++i)
 	{
-		Vector3 vec = controlPoints[i];
+		Vector3 vec = controlPoints[i].point;
 		Vector3 point = absoluteViewportCoordinates(vec);
 		if (i == selectedPoint)
 		{
@@ -58,11 +59,16 @@ void TransferFunctionEditor::keyPressEvent(QKeyEvent *e)
 	const Qt::KeyboardModifiers modifiers = e->modifiers();
 
 	bool handled = false;
-	//	if ((e->key() == Qt::Key_W) && (modifiers == Qt::NoButton))
-	//	{
-	//		handled = true;
-	//		updateGL();
-	//	}
+	if ((e->key() == Qt::Key_Space) && (modifiers == Qt::NoButton))
+	{
+		if (selectedPoint != -1)
+		{
+			QColor color = QColorDialog::getColor(Qt::black, this);
+			controlPoints[selectedPoint].color = color;
+			handled = true;
+			updateGL();
+		}
+	}
 
 	if (!handled)
 		QGLViewer::keyPressEvent(e);
@@ -84,7 +90,7 @@ void TransferFunctionEditor::mousePressEvent(QMouseEvent* e)
 
 		for (int i = 0; i < controlPoints.size(); ++i)
 		{
-			Vector3 vec = controlPoints[i];
+			Vector3 vec = controlPoints[i].point;
 			QString text("Point: ");
 			text += QString::number(vec.x);
 			text += " ";
@@ -116,16 +122,16 @@ void TransferFunctionEditor::mousePressEvent(QMouseEvent* e)
 	}
 }
 
-bool comp(Vector3 vec1, Vector3 vec2)
+bool comp(ControlPoint p1, ControlPoint p2)
 {
-	return (vec1.x <= vec2.x);
+	return (p1.point.x <= p2.point.x);
 }
 
 void TransferFunctionEditor::addPointSlot()
 {
 	Vector3 point = normalizedViewportCoordinates(lastMouseClick.x(),
 			lastMouseClick.y());
-	controlPoints.push_back(point);
+	controlPoints.push_back(ControlPoint(point));
 	std::sort(controlPoints.begin(), controlPoints.end(), comp);
 	selectedPoint = -1;
 	updateGL();
