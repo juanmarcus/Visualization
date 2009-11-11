@@ -33,11 +33,20 @@ void TransferFunctionEditor::draw()
 	glColor3f(1.0, 1.0, 1.0);
 	drawFullScreenQuad();
 
-	glColor3f(0.3, 0.3, 0.3);
+	// Convert points to screen
+	std::vector<Vector3> points;
 	for (int i = 0; i < controlPoints.size(); ++i)
 	{
 		Vector3 vec = controlPoints[i].point;
 		Vector3 point = absoluteViewportCoordinates(vec);
+		points.push_back(point);
+	}
+
+	// Draw points
+	glColor3f(0.3, 0.3, 0.3);
+	for (int i = 0; i < points.size(); ++i)
+	{
+		Vector3 point = points[i];
 		if (i == selectedPoint)
 		{
 			glColor3f(0.0, 0.0, 0.0);
@@ -49,6 +58,20 @@ void TransferFunctionEditor::draw()
 			geometryDrawer2d.drawCircle(point, 5);
 		}
 	}
+
+	// Draw opacity lines
+	glColor3f(0.0, 0.0, 0.0);
+
+	glBegin(GL_LINE_STRIP);
+	glVertex2f(0, 0);
+	for (int i = 0; i < points.size(); ++i)
+	{
+		Vector3 point = points[i];
+		//			geometryDrawer2d.drawCircle(point, 5);
+		glVertex2f(point.x, point.y);
+	}
+	//last vertex based on viewport
+	glEnd();
 
 	stop2DMode();
 }
