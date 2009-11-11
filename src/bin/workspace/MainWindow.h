@@ -4,6 +4,7 @@
 #include <QtGui/QMainWindow>
 #include <QtGui/QMdiArea>
 #include "NrrdVolumeViewer.h"
+#include "TransferFunctionEditor.h"
 
 class MainWindow: public QMainWindow
 {
@@ -19,6 +20,9 @@ private:
 
 	// Volume viewer
 	NrrdVolumeViewer* volumeViewer;
+
+	// Transfer function editor
+	TransferFunctionEditor* transferFunctionEditor;
 
 };
 

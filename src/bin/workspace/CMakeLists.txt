@@ -14,5 +14,5 @@ SET (full_sources
     ${moc_sources}
 )
 
-ADD_EXECUTABLE (volumeviewer ${full_sources})
-TARGET_LINK_LIBRARIES (volumeviewer ${LIBS})
+ADD_EXECUTABLE (workspace ${full_sources})
+TARGET_LINK_LIBRARIES (workspace ${LIBS})

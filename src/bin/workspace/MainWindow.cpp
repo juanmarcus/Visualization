@@ -9,6 +9,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	volumeViewer = new NrrdVolumeViewer();
 	mdiArea->addSubWindow(volumeViewer);
+
+	transferFunctionEditor = new TransferFunctionEditor();
+	mdiArea->addSubWindow(transferFunctionEditor);
+
 }
 
 MainWindow::~MainWindow()

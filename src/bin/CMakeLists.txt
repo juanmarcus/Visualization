@@ -19,8 +19,8 @@ ENDFOREACH (cpp_source)
 SET (folders
     "query_ray"
     "raycasting"
-    "volumeviewer"
     "txf_editor"
+    "workspace"
 )
 
 # Parse each subdirectory
