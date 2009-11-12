@@ -404,20 +404,13 @@ void TransferFunctionEditor::saveTexture()
 		mode2d.disable();
 		framebuffer.release();
 
-		//read pixels from bottom line
-
+		// Read the framebuffer to an image (missing alpha channel)
 		QImage image = framebuffer.toImage();
-		if (image.hasAlphaChannel())
-		{
-			cout << "fucking has!!\n";
-		}
-		else
-		{
-			cout << "damn!!\n";
-		}
-		image.save(filename, "png", 100);
-		//save the new texture to a file
 
+		// Save the image (should be a 1D image)
+		image.save(filename, "png", 100);
+
+		// Restore previous viewport state
 		restoreViewport();
 		updateGL();
 	}
