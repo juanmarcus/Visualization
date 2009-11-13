@@ -10,15 +10,11 @@
 using namespace std;
 
 TransferFunctionEditor::TransferFunctionEditor(QWidget *parent) :
-	ibiQGLViewer(parent), selectedPoint(-1)
+	ibiQGLViewer(QGLFormat(QGL::AlphaChannel),parent), selectedPoint(-1)
 {
 	viewOpacity = false;
 
 	createActions();
-
-	QGLFormat format;
-	format.setAlpha(true);
-	setFormat(format);
 }
 
 TransferFunctionEditor::~TransferFunctionEditor()
@@ -386,22 +382,26 @@ void TransferFunctionEditor::saveTexture()
 	{
 
 		int textureWidth = 64;
+		int textureHeight = 16;
 
 		// May be needed
 		makeCurrent();
 
 		// 2D mode
 		GLMode2D mode2d;
-		mode2d.setScreenDimensions(textureWidth, 4);
+		mode2d.setScreenDimensions(textureWidth, textureHeight);
 
 		saveViewport();
 
 		// Create the framebuffer and start rendering
-		QGLFramebufferObject framebuffer(textureWidth, 4, GL_TEXTURE_2D);
+		QGLFramebufferObject framebuffer(textureWidth, textureHeight,
+				GL_TEXTURE_2D);
 		framebuffer.bind();
 		mode2d.enable();
-		glViewport(0, 0, textureWidth, 4);
+		glViewport(0, 0, textureWidth, textureHeight);
 		glClear(GL_COLOR_BUFFER_BIT);
+		glColor4f(1.0,1.0,1.0,1.0);
+		mode2d.drawFullScreenQuad();
 
 		Vector3 pi = controlPoints[0].point;
 		Vector3 pf = controlPoints[controlPoints.size() - 1].point;
@@ -422,17 +422,18 @@ void TransferFunctionEditor::saveTexture()
 			float x1 = ((p1.x - pi.x) / dx) * textureWidth;
 			float x2 = ((p2.x - pi.x) / dx) * textureWidth;
 
-			glColor4f(c1.x, c1.y, c1.z, 0.5);
+			glColor4f(c1.x, c1.y, c1.z, p1.y);
 			glVertex2f(x1, 0);
 
-			glColor4f(c2.x, c2.y, c2.z, 0.5);
+			glColor4f(c2.x, c2.y, c2.z, p2.y);
 			glVertex2f(x2, 0);
 
-			glColor4f(c2.x, c2.y, c2.z, 0.5);
-			glVertex2f(x2, 4);
+			glColor4f(c2.x, c2.y, c2.z, p2.y);
+			glVertex2f(x2, textureHeight);
 
-			glColor4f(c1.x, c1.y, c1.z, 0.5);
-			glVertex2f(x1, 4);
+			glColor4f(c1.x, c1.y, c1.z, p1.y);
+			glVertex2f(x1, textureHeight);
+
 		}
 		glEnd();
 
