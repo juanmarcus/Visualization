@@ -447,7 +447,7 @@ void TransferFunctionEditor::saveTexture()
 		QImage image = framebuffer.toImage();
 
 		// Save the image
-		image.save(filename, "png", 100);
+		image.save(filename);
 
 		// Restore previous viewport state
 		restoreViewport();
