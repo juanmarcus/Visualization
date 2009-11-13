@@ -10,7 +10,7 @@
 using namespace std;
 
 TransferFunctionEditor::TransferFunctionEditor(QWidget *parent) :
-	ibiQGLViewer(QGLFormat(QGL::AlphaChannel),parent), selectedPoint(-1)
+	ibiQGLViewer(QGLFormat(QGL::AlphaChannel), parent), selectedPoint(-1)
 {
 	viewOpacity = false;
 
@@ -400,7 +400,7 @@ void TransferFunctionEditor::saveTexture()
 		mode2d.enable();
 		glViewport(0, 0, textureWidth, textureHeight);
 		glClear(GL_COLOR_BUFFER_BIT);
-		glColor4f(1.0,1.0,1.0,1.0);
+		glColor4f(1.0, 1.0, 1.0, 1.0);
 		mode2d.drawFullScreenQuad();
 
 		Vector3 pi = controlPoints[0].point;
@@ -441,13 +441,30 @@ void TransferFunctionEditor::saveTexture()
 
 		// Stop rendering
 		mode2d.disable();
-		framebuffer.release();
 
 		// Read the framebuffer to an image
-		QImage image = framebuffer.toImage();
+		//		QImage image = framebuffer.toImage();
 
-		// Save the image
-		image.save(filename);
+		QImage img(framebuffer.size(), QImage::Format_ARGB32);
+		int w = framebuffer.width();
+		int h = framebuffer.height();
+		glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
+		// OpenGL gives ABGR (i.e. RGBA backwards); Qt wants ARGB
+		for (int y = 0; y < h; y++)
+		{
+			uint *q = (uint*) img.scanLine(y);
+			for (int x = 0; x < w; ++x)
+			{
+				const uint pixel = *q;
+				*q = ((pixel << 16) & 0xff0000) | ((pixel >> 16) & 0xff)
+						| (pixel & 0xff00ff00);
+				q++;
+			}
+		}
+
+		framebuffer.release();
+
+		img.save(filename);
 
 		// Restore previous viewport state
 		restoreViewport();
