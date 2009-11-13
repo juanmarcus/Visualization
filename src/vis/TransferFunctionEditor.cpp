@@ -12,7 +12,7 @@ using namespace std;
 TransferFunctionEditor::TransferFunctionEditor(QWidget *parent) :
 	ibiQGLViewer(parent), selectedPoint(-1)
 {
-	viewOpacity = true;
+	viewOpacity = false;
 
 	createActions();
 
@@ -385,7 +385,7 @@ void TransferFunctionEditor::saveTexture()
 	if (!filename.isEmpty())
 	{
 
-		int textureWidth = 512;
+		int textureWidth = 64;
 
 		// May be needed
 		makeCurrent();
@@ -401,11 +401,15 @@ void TransferFunctionEditor::saveTexture()
 		framebuffer.bind();
 		mode2d.enable();
 		glViewport(0, 0, textureWidth, 4);
+		glClear(GL_COLOR_BUFFER_BIT);
 
 		Vector3 pi = controlPoints[0].point;
 		Vector3 pf = controlPoints[controlPoints.size() - 1].point;
 
 		float dx = pf.x - pi.x;
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_ONE, GL_ZERO);
 
 		glBegin(GL_QUADS);
 		for (int i = 0; i < controlPoints.size() - 1; ++i)
@@ -418,28 +422,30 @@ void TransferFunctionEditor::saveTexture()
 			float x1 = ((p1.x - pi.x) / dx) * textureWidth;
 			float x2 = ((p2.x - pi.x) / dx) * textureWidth;
 
-			glColor4f(c1.x, c1.y, c1.z, p1.y);
+			glColor4f(c1.x, c1.y, c1.z, 0.5);
 			glVertex2f(x1, 0);
 
-			glColor4f(c2.x, c2.y, c2.z, p2.y);
+			glColor4f(c2.x, c2.y, c2.z, 0.5);
 			glVertex2f(x2, 0);
 
-			glColor4f(c2.x, c2.y, c2.z, p2.y);
+			glColor4f(c2.x, c2.y, c2.z, 0.5);
 			glVertex2f(x2, 4);
 
-			glColor4f(c1.x, c1.y, c1.z, p1.y);
+			glColor4f(c1.x, c1.y, c1.z, 0.5);
 			glVertex2f(x1, 4);
 		}
 		glEnd();
+
+		glDisable(GL_BLEND);
 
 		// Stop rendering
 		mode2d.disable();
 		framebuffer.release();
 
-		// Read the framebuffer to an image (missing alpha channel)
+		// Read the framebuffer to an image
 		QImage image = framebuffer.toImage();
 
-		// Save the image (should be a 1D image)
+		// Save the image
 		image.save(filename, "png", 100);
 
 		// Restore previous viewport state
