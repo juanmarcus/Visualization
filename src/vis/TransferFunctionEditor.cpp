@@ -12,7 +12,13 @@ using namespace std;
 TransferFunctionEditor::TransferFunctionEditor(QWidget *parent) :
 	ibiQGLViewer(parent), selectedPoint(-1)
 {
+	viewOpacity = true;
+
 	createActions();
+
+	QGLFormat format;
+	format.setAlpha(true);
+	setFormat(format);
 }
 
 TransferFunctionEditor::~TransferFunctionEditor()
@@ -30,6 +36,8 @@ void TransferFunctionEditor::init()
 {
 	// Init glew
 	//	glewInit();
+
+	glDisable(GL_BLEND);
 
 	setDesiredAspectRatio(4.0);
 }
@@ -96,6 +104,9 @@ void TransferFunctionEditor::draw()
 	}
 
 	// Draw colors
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ZERO);
+
 	glBegin(GL_QUADS);
 	int max = points.size() - 1;
 	for (int i = 0; i < max; ++i)
@@ -105,20 +116,36 @@ void TransferFunctionEditor::draw()
 		Vector3 c1 = controlPoints[i].color;
 		Vector3 c2 = controlPoints[i + 1].color;
 
-		glColor3f(c1.x, c1.y, c1.z);
+		float p1a;
+		float p2a;
+
+		if (viewOpacity)
+		{
+			p1a = controlPoints[i].point.y;
+			p2a = controlPoints[i + 1].point.y;
+		}
+		else
+		{
+			p1a = 1.0;
+			p2a = 1.0;
+		}
+
+		glColor4f(c1.x, c1.y, c1.z, p1a);
 		glVertex2f(p1.x, 0);
 
-		glColor3f(c2.x, c2.y, c2.z);
+		glColor4f(c2.x, c2.y, c2.z, p2a);
 		glVertex2f(p2.x, 0);
 
-		glColor3f(c2.x, c2.y, c2.z);
+		glColor4f(c2.x, c2.y, c2.z, p2a);
 		glVertex2f(p2.x, viewportMiddle);
 
-		glColor3f(c1.x, c1.y, c1.z);
+		glColor4f(c1.x, c1.y, c1.z, p1a);
 		glVertex2f(p1.x, viewportMiddle);
 
 	}
 	glEnd();
+
+	glDisable(GL_BLEND);
 
 	stop2DMode();
 }
@@ -229,6 +256,11 @@ void TransferFunctionEditor::keyPressEvent(QKeyEvent *e)
 	else if ((e->key() == Qt::Key_O) && (modifiers == Qt::ControlModifier))
 	{
 		loadTextureDescription();
+		handled = true;
+	}
+	else if ((e->key() == Qt::Key_O) && (modifiers == Qt::NoModifier))
+	{
+		viewOpacity = !viewOpacity;
 		handled = true;
 	}
 

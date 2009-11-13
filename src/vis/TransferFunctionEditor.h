@@ -56,6 +56,7 @@ private:
 	// Temporary
 	QPoint lastMouseClick;
 	int selectedPoint;
+	bool viewOpacity;
 
 	// Transfer function data
 	std::vector<ControlPoint> controlPoints;
