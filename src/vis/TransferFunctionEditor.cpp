@@ -146,6 +146,11 @@ void TransferFunctionEditor::draw()
 	stop2DMode();
 }
 
+Texture* TransferFunctionEditor::getCurrentTransferFunction()
+{
+	return 0;
+}
+
 void TransferFunctionEditor::keyPressEvent(QKeyEvent *e)
 {
 	// Get event modifiers key
