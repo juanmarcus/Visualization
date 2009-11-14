@@ -41,8 +41,6 @@ public slots:
 	void saveTextureDescription();
 	void loadTextureDescription();
 	void saveTexture();
-
-protected slots:
 	void addPointSlot();
 
 protected:
