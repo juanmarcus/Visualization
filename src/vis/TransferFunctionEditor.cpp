@@ -147,11 +147,6 @@ void TransferFunctionEditor::draw()
 	stop2DMode();
 }
 
-Texture* TransferFunctionEditor::getCurrentTransferFunction()
-{
-	return 0;
-}
-
 void TransferFunctionEditor::keyPressEvent(QKeyEvent *e)
 {
 	// Get event modifiers key
@@ -376,6 +371,86 @@ void TransferFunctionEditor::saveTextureDescription()
 	}
 }
 
+Texture* TransferFunctionEditor::renderToTexture()
+{
+	int textureWidth = 64;
+	int textureHeight = 16;
+
+	// May be needed
+	makeCurrent();
+
+	// 2D mode
+	GLMode2D mode2d;
+	mode2d.setScreenDimensions(textureWidth, textureHeight);
+
+	// Create target texture
+	TextureLoadingInfo info;
+	info.target = GL_TEXTURE_2D;
+	info.texture_type = "empty";
+	info.options["width"] = textureWidth;
+	info.options["height"] = textureHeight;
+	info.options["internalformat"] = GL_RGBA;
+	info.options["format"] = GL_RGBA;
+	info.options["type"] = GL_FLOAT;
+	Texture* renderTarget = loadTexture(info);
+
+	// Create the framebuffer and start rendering
+	Framebuffer framebuffer;
+	framebuffer.init();
+	framebuffer.setTarget(renderTarget);
+	//		QGLFramebufferObject framebuffer(textureWidth, textureHeight,
+	//				GL_TEXTURE_2D);
+	framebuffer.bind();
+	mode2d.enable();
+	glViewport(0, 0, textureWidth, textureHeight);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor4f(1.0, 1.0, 1.0, 1.0);
+	mode2d.drawFullScreenQuad();
+
+	Vector3 pi = controlPoints[0].point;
+	Vector3 pf = controlPoints[controlPoints.size() - 1].point;
+
+	float dx = pf.x - pi.x;
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ZERO);
+
+	glBegin(GL_QUADS);
+	for (int i = 0; i < controlPoints.size() - 1; ++i)
+	{
+		Vector3 p1 = controlPoints[i].point;
+		Vector3 c1 = controlPoints[i].color;
+		Vector3 p2 = controlPoints[i + 1].point;
+		Vector3 c2 = controlPoints[i + 1].color;
+
+		float x1 = ((p1.x - pi.x) / dx) * textureWidth;
+		float x2 = ((p2.x - pi.x) / dx) * textureWidth;
+
+		glColor4f(c1.x, c1.y, c1.z, p1.y);
+		glVertex2f(x1, 0);
+
+		glColor4f(c2.x, c2.y, c2.z, p2.y);
+		glVertex2f(x2, 0);
+
+		glColor4f(c2.x, c2.y, c2.z, p2.y);
+		glVertex2f(x2, textureHeight);
+
+		glColor4f(c1.x, c1.y, c1.z, p1.y);
+		glVertex2f(x1, textureHeight);
+
+	}
+	glEnd();
+
+	glDisable(GL_BLEND);
+
+	// Stop rendering in 2D
+	mode2d.disable();
+
+	framebuffer.release();
+
+	return renderTarget;
+}
+
 void TransferFunctionEditor::saveTexture()
 {
 	if (controlPoints.size() < 2)
@@ -387,80 +462,19 @@ void TransferFunctionEditor::saveTexture()
 	if (!filename.isEmpty())
 	{
 
-		int textureWidth = 64;
-		int textureHeight = 16;
-
-		// May be needed
-		makeCurrent();
-
-		// 2D mode
-		GLMode2D mode2d;
-		mode2d.setScreenDimensions(textureWidth, textureHeight);
-
-		// Create target texture
-		TextureLoadingInfo info;
-		info.target = GL_TEXTURE_2D;
-		info.texture_type = "empty";
-		info.options["width"] = textureWidth;
-		info.options["height"] = textureHeight;
-		info.options["internalformat"] = GL_RGBA;
-		info.options["format"] = GL_RGBA;
-		info.options["type"] = GL_FLOAT;
-		Texture* renderTarget = loadTexture(info);
+		Texture* result = renderToTexture();
 
 		// Create the framebuffer and start rendering
 		Framebuffer framebuffer;
 		framebuffer.init();
-		framebuffer.setTarget(renderTarget);
+		framebuffer.setTarget(result);
 		//		QGLFramebufferObject framebuffer(textureWidth, textureHeight,
 		//				GL_TEXTURE_2D);
 		framebuffer.bind();
-		mode2d.enable();
-		glViewport(0, 0, textureWidth, textureHeight);
-		glClear(GL_COLOR_BUFFER_BIT);
-		glColor4f(1.0, 1.0, 1.0, 1.0);
-		mode2d.drawFullScreenQuad();
-
-		Vector3 pi = controlPoints[0].point;
-		Vector3 pf = controlPoints[controlPoints.size() - 1].point;
-
-		float dx = pf.x - pi.x;
-
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE, GL_ZERO);
-
-		glBegin(GL_QUADS);
-		for (int i = 0; i < controlPoints.size() - 1; ++i)
-		{
-			Vector3 p1 = controlPoints[i].point;
-			Vector3 c1 = controlPoints[i].color;
-			Vector3 p2 = controlPoints[i + 1].point;
-			Vector3 c2 = controlPoints[i + 1].color;
-
-			float x1 = ((p1.x - pi.x) / dx) * textureWidth;
-			float x2 = ((p2.x - pi.x) / dx) * textureWidth;
-
-			glColor4f(c1.x, c1.y, c1.z, p1.y);
-			glVertex2f(x1, 0);
-
-			glColor4f(c2.x, c2.y, c2.z, p2.y);
-			glVertex2f(x2, 0);
-
-			glColor4f(c2.x, c2.y, c2.z, p2.y);
-			glVertex2f(x2, textureHeight);
-
-			glColor4f(c1.x, c1.y, c1.z, p1.y);
-			glVertex2f(x1, textureHeight);
-
-		}
-		glEnd();
-
-		glDisable(GL_BLEND);
-
-		// Stop rendering in 2D
-		mode2d.disable();
 
 		// Read the framebuffer to an image
+		int textureWidth = result->getWidth();
+		int textureHeight = result->getHeight();
 		QImage img(textureWidth, textureHeight, QImage::Format_ARGB32);
 		glReadPixels(0, 0, textureWidth, textureHeight, GL_RGBA,
 				GL_UNSIGNED_BYTE, img.bits());
@@ -481,7 +495,6 @@ void TransferFunctionEditor::saveTexture()
 
 		img.save(filename);
 
-		updateGL();
 	}
 }
 

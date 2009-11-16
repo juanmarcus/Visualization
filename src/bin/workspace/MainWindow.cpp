@@ -62,7 +62,7 @@ void MainWindow::openVolumeSlot()
 
 void MainWindow::applyTransferFunctionSlot()
 {
-	Texture* txf_func = transferFunctionEditor->getCurrentTransferFunction();
+	Texture* txf_func = transferFunctionEditor->renderToTexture();
 	raycastingViewer->setTransferFunction(txf_func);
 
 }
