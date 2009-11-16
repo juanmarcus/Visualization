@@ -3,8 +3,10 @@
 
 #include <QtGui/QMainWindow>
 #include <QtGui/QMdiArea>
-#include "NrrdVolumeViewer.h"
+#include "ibi_qt/ibiQRaycastingViewer.h"
 #include "TransferFunctionEditor.h"
+
+using namespace ibi;
 
 class MainWindow: public QMainWindow
 {
@@ -14,15 +16,28 @@ public:
 	MainWindow(QWidget *parent = 0);
 	~MainWindow();
 
+public slots:
+	void openVolumeSlot();
+	void applyTransferFunctionSlot();
+
+private:
+	void createActions();
+	void createMenus();
+
 private:
 	// MDI area
 	QMdiArea* mdiArea;
 
 	// Volume viewer
-	NrrdVolumeViewer* volumeViewer;
+	ibiQRaycastingViewer* raycastingViewer;
 
 	// Transfer function editor
 	TransferFunctionEditor* transferFunctionEditor;
+
+	// Actions
+	QAction* exitAct;
+	QAction* openVolumeAct;
+	QAction* applyTransferFunctionAct;
 
 };
 
