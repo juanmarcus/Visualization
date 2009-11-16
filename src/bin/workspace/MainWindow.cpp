@@ -62,8 +62,14 @@ void MainWindow::openVolumeSlot()
 
 void MainWindow::applyTransferFunctionSlot()
 {
-	Texture* txf_func = transferFunctionEditor->renderToTexture();
-	raycastingViewer->setTransferFunction(txf_func);
+	QImage img = transferFunctionEditor->getTransferFunctionAsQImage();
+
+	if (img.isNull())
+	{
+		return;
+	}
+
+	raycastingViewer->setTransferFunction(img);
 
 }
 

@@ -36,7 +36,8 @@ public:
 	void keyPressEvent(QKeyEvent *e);
 	void mousePressEvent(QMouseEvent* e);
 
-	Texture* renderToTexture();
+	Texture* getTransferFunctionAsTexture();
+	QImage getTransferFunctionAsQImage();
 public slots:
 	void saveTextureDescription();
 	void loadTextureDescription();

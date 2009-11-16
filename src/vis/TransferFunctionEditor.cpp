@@ -371,8 +371,13 @@ void TransferFunctionEditor::saveTextureDescription()
 	}
 }
 
-Texture* TransferFunctionEditor::renderToTexture()
+Texture* TransferFunctionEditor::getTransferFunctionAsTexture()
 {
+	if (controlPoints.size() < 2)
+	{
+		return 0;
+	}
+
 	int textureWidth = 64;
 	int textureHeight = 16;
 
@@ -451,6 +456,48 @@ Texture* TransferFunctionEditor::renderToTexture()
 	return renderTarget;
 }
 
+QImage TransferFunctionEditor::getTransferFunctionAsQImage()
+{
+	// Render to texture
+	Texture* result = getTransferFunctionAsTexture();
+
+	if (!result)
+	{
+		return QImage();
+	}
+
+	// Create the framebuffer and start rendering
+	Framebuffer framebuffer;
+	framebuffer.init();
+	framebuffer.setTarget(result);
+	//		QGLFramebufferObject framebuffer(textureWidth, textureHeight,
+	//				GL_TEXTURE_2D);
+	framebuffer.bind();
+
+	// Read the framebuffer to an image
+	int textureWidth = result->getWidth();
+	int textureHeight = result->getHeight();
+	QImage img(textureWidth, textureHeight, QImage::Format_ARGB32);
+	glReadPixels(0, 0, textureWidth, textureHeight, GL_RGBA, GL_UNSIGNED_BYTE,
+			img.bits());
+	// OpenGL gives ABGR (i.e. RGBA backwards); Qt wants ARGB
+	for (int y = 0; y < textureHeight; y++)
+	{
+		uint *q = (uint*) img.scanLine(y);
+		for (int x = 0; x < textureWidth; ++x)
+		{
+			const uint pixel = *q;
+			*q = ((pixel << 16) & 0xff0000) | ((pixel >> 16) & 0xff) | (pixel
+					& 0xff00ff00);
+			q++;
+		}
+	}
+
+	framebuffer.release();
+
+	return img;
+}
+
 void TransferFunctionEditor::saveTexture()
 {
 	if (controlPoints.size() < 2)
@@ -462,36 +509,7 @@ void TransferFunctionEditor::saveTexture()
 	if (!filename.isEmpty())
 	{
 
-		Texture* result = renderToTexture();
-
-		// Create the framebuffer and start rendering
-		Framebuffer framebuffer;
-		framebuffer.init();
-		framebuffer.setTarget(result);
-		//		QGLFramebufferObject framebuffer(textureWidth, textureHeight,
-		//				GL_TEXTURE_2D);
-		framebuffer.bind();
-
-		// Read the framebuffer to an image
-		int textureWidth = result->getWidth();
-		int textureHeight = result->getHeight();
-		QImage img(textureWidth, textureHeight, QImage::Format_ARGB32);
-		glReadPixels(0, 0, textureWidth, textureHeight, GL_RGBA,
-				GL_UNSIGNED_BYTE, img.bits());
-		// OpenGL gives ABGR (i.e. RGBA backwards); Qt wants ARGB
-		for (int y = 0; y < textureHeight; y++)
-		{
-			uint *q = (uint*) img.scanLine(y);
-			for (int x = 0; x < textureWidth; ++x)
-			{
-				const uint pixel = *q;
-				*q = ((pixel << 16) & 0xff0000) | ((pixel >> 16) & 0xff)
-						| (pixel & 0xff00ff00);
-				q++;
-			}
-		}
-
-		framebuffer.release();
+		QImage img = getTransferFunctionAsQImage();
 
 		img.save(filename);
 
