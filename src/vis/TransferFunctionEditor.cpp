@@ -4,7 +4,7 @@
 #include "QtGui/QColorDialog"
 #include "QtGui/QFileDialog"
 #include "QtGui/QKeyEvent"
-#include "QtOpenGL/QGLFramebufferObject"
+#include "ibi_framebuffer/Framebuffer.h"
 #include <fstream>
 
 using namespace std;
@@ -28,10 +28,11 @@ void TransferFunctionEditor::createActions()
 	connect(addPointAct, SIGNAL(triggered()), this, SLOT(addPointSlot()));
 }
 
-void TransferFunctionEditor::init()
+void TransferFunctionEditor::ibi_init()
 {
 	// Init glew
 	//	glewInit();
+	loadPlugin("../ibi/build/lib/libtexture_loader_empty.so");
 
 	glDisable(GL_BLEND);
 
@@ -396,11 +397,23 @@ void TransferFunctionEditor::saveTexture()
 		GLMode2D mode2d;
 		mode2d.setScreenDimensions(textureWidth, textureHeight);
 
-		saveViewport();
+		// Create target texture
+		TextureLoadingInfo info;
+		info.target = GL_TEXTURE_2D;
+		info.texture_type = "empty";
+		info.options["width"] = textureWidth;
+		info.options["height"] = textureHeight;
+		info.options["internalformat"] = GL_RGBA;
+		info.options["format"] = GL_RGBA;
+		info.options["type"] = GL_FLOAT;
+		Texture* renderTarget = loadTexture(info);
 
 		// Create the framebuffer and start rendering
-		QGLFramebufferObject framebuffer(textureWidth, textureHeight,
-				GL_TEXTURE_2D);
+		Framebuffer framebuffer;
+		framebuffer.init();
+		framebuffer.setTarget(renderTarget);
+		//		QGLFramebufferObject framebuffer(textureWidth, textureHeight,
+		//				GL_TEXTURE_2D);
 		framebuffer.bind();
 		mode2d.enable();
 		glViewport(0, 0, textureWidth, textureHeight);
@@ -444,21 +457,18 @@ void TransferFunctionEditor::saveTexture()
 
 		glDisable(GL_BLEND);
 
-		// Stop rendering
+		// Stop rendering in 2D
 		mode2d.disable();
 
 		// Read the framebuffer to an image
-		//		QImage image = framebuffer.toImage();
-
-		QImage img(framebuffer.size(), QImage::Format_ARGB32);
-		int w = framebuffer.width();
-		int h = framebuffer.height();
-		glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
+		QImage img(textureWidth, textureHeight, QImage::Format_ARGB32);
+		glReadPixels(0, 0, textureWidth, textureHeight, GL_RGBA,
+				GL_UNSIGNED_BYTE, img.bits());
 		// OpenGL gives ABGR (i.e. RGBA backwards); Qt wants ARGB
-		for (int y = 0; y < h; y++)
+		for (int y = 0; y < textureHeight; y++)
 		{
 			uint *q = (uint*) img.scanLine(y);
-			for (int x = 0; x < w; ++x)
+			for (int x = 0; x < textureWidth; ++x)
 			{
 				const uint pixel = *q;
 				*q = ((pixel << 16) & 0xff0000) | ((pixel >> 16) & 0xff)
@@ -471,8 +481,6 @@ void TransferFunctionEditor::saveTexture()
 
 		img.save(filename);
 
-		// Restore previous viewport state
-		restoreViewport();
 		updateGL();
 	}
 }
