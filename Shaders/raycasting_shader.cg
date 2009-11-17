@@ -74,10 +74,22 @@ fragment_out fragment_main( vertex_fragment IN,
     {
       value = tex3D(volume_tex,vec).a;
       color_sample = tex1D(txf_func,value);
-      //color_sample = float4(value,value,value,1.0);
-      alpha_sample = color_sample.a * stepsize;
-      //if (value < 0.2) alpha_sample = 0.0;
-      col_acc   += (1.0 - alpha_acc) * color_sample * alpha_sample * 3;
+      alpha_sample = 1 - exp(-stepsize * color_sample.a);
+      //float v1 = 0.6;
+      //float v2 = 0.7;
+      
+      //if ((value >= v1)&&(value < v2))
+      //{
+      //	col_acc = float4(1.0,0.0,0.0,0.0);
+      //	break;
+      //}else {
+      //	col_acc = float4(0.0,0.0,0.0,0.0);
+      //vec += delta_dir;
+      //	continue;
+      //}
+      
+      
+      col_acc   += (1.0 - alpha_acc) * color_sample * alpha_sample;
       alpha_acc += alpha_sample;
       vec += delta_dir;
       length_acc += delta_dir_len;
