@@ -20,6 +20,7 @@ SET (folders
     "query_ray"
     "raycasting"
     "txf_editor"
+    "view_slices"
     "workspace"
 )
 
