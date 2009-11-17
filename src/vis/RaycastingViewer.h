@@ -21,7 +21,7 @@ public:
 	RaycastingViewer(QWidget *parent = 0);
 	~RaycastingViewer();
 
-	void ibi_init();
+	void init();
 	void initGlew();
 	void initCG();
 	void initFramebuffer();

@@ -28,7 +28,7 @@ void TransferFunctionEditor::createActions()
 	connect(addPointAct, SIGNAL(triggered()), this, SLOT(addPointSlot()));
 }
 
-void TransferFunctionEditor::ibi_init()
+void TransferFunctionEditor::init()
 {
 	// Init glew
 	//	glewInit();

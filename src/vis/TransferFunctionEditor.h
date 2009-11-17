@@ -30,7 +30,7 @@ public:
 	TransferFunctionEditor(QWidget *parent = 0);
 	~TransferFunctionEditor();
 
-	void ibi_init();
+	void init();
 	void draw();
 
 	void keyPressEvent(QKeyEvent *e);

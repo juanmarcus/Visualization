@@ -21,7 +21,7 @@ RaycastingViewer::~RaycastingViewer()
 
 }
 
-void RaycastingViewer::ibi_init()
+void RaycastingViewer::init()
 {
 	initGlew();
 	initCG();
