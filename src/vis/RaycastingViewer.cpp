@@ -81,7 +81,7 @@ void RaycastingViewer::initCG()
 void RaycastingViewer::initFramebuffer()
 {
 	// Start framebuffer
-	framebuffer.init();
+	framebufferObject.init();
 
 	// Start texture manager
 	loadPlugin("../ibi/build/lib/libtexture_loader_empty.so");
@@ -179,8 +179,8 @@ void RaycastingViewer::drawQuads(float x, float y, float z)
 void RaycastingViewer::render_backface()
 {
 	// draw to backface
-	framebuffer.setTarget(backface);
-	framebuffer.bind();
+	framebufferObject.setTarget(backface);
+	framebufferObject.bind();
 
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -188,14 +188,14 @@ void RaycastingViewer::render_backface()
 	glCullFace(GL_FRONT);
 	drawQuads(1.0, 1.0, 1.0);
 
-	framebuffer.release();
+	framebufferObject.release();
 }
 
 void RaycastingViewer::raycasting_pass()
 {
 	// Draw to final image
-	framebuffer.setTarget(final_image);
-	framebuffer.bind();
+	framebufferObject.setTarget(final_image);
+	framebufferObject.bind();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -215,7 +215,7 @@ void RaycastingViewer::raycasting_pass()
 	vertexProgram->disable();
 	fragmentProgram->disable();
 
-	framebuffer.release();
+	framebufferObject.release();
 }
 
 // display the final image on the screen

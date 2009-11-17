@@ -9,7 +9,7 @@
 #include "ibi_gl/Texture.h"
 #include "ibi_texturemanager/TextureManager.h"
 #include "ibi_gpuprogrammanager/GPUProgramManager.h"
-#include "ibi_framebuffer/Framebuffer.h"
+#include "ibi_gl/FramebufferObject.h"
 
 using namespace ibi;
 
@@ -65,7 +65,7 @@ private:
 	FragmentProgram::Parameter stepsize_param;
 
 	// Framebuffer object
-	Framebuffer framebuffer;
+	FramebufferObject framebufferObject;
 };
 
 #endif // RAYCASTINGVIEWER_H

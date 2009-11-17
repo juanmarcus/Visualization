@@ -4,7 +4,7 @@
 #include "QtGui/QColorDialog"
 #include "QtGui/QFileDialog"
 #include "QtGui/QKeyEvent"
-#include "ibi_framebuffer/Framebuffer.h"
+#include "ibi_gl/FramebufferObject.h"
 #include <fstream>
 
 using namespace std;
@@ -78,7 +78,6 @@ void TransferFunctionEditor::draw()
 	for (int i = 0; i < points.size(); ++i)
 	{
 		Vector3 point = points[i];
-		//			geometryDrawer2d.drawCircle(point, 5);
 		glVertex2f(point.x, point.y);
 	}
 	glEnd();
@@ -400,12 +399,12 @@ Texture* TransferFunctionEditor::getTransferFunctionAsTexture()
 	Texture* renderTarget = loadTexture(info);
 
 	// Create the framebuffer and start rendering
-	Framebuffer framebuffer;
-	framebuffer.init();
-	framebuffer.setTarget(renderTarget);
+	FramebufferObject framebufferObject;
+	framebufferObject.init();
+	framebufferObject.setTarget(renderTarget);
 	//		QGLFramebufferObject framebuffer(textureWidth, textureHeight,
 	//				GL_TEXTURE_2D);
-	framebuffer.bind();
+	framebufferObject.bind();
 	mode2d.enable();
 	glViewport(0, 0, textureWidth, textureHeight);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -451,7 +450,7 @@ Texture* TransferFunctionEditor::getTransferFunctionAsTexture()
 	// Stop rendering in 2D
 	mode2d.disable();
 
-	framebuffer.release();
+	framebufferObject.release();
 
 	return renderTarget;
 }
@@ -467,12 +466,12 @@ QImage TransferFunctionEditor::getTransferFunctionAsQImage()
 	}
 
 	// Create the framebuffer and start rendering
-	Framebuffer framebuffer;
-	framebuffer.init();
-	framebuffer.setTarget(result);
+	FramebufferObject framebufferObject;
+	framebufferObject.init();
+	framebufferObject.setTarget(result);
 	//		QGLFramebufferObject framebuffer(textureWidth, textureHeight,
 	//				GL_TEXTURE_2D);
-	framebuffer.bind();
+	framebufferObject.bind();
 
 	// Read the framebuffer to an image
 	int textureWidth = result->getWidth();
@@ -493,7 +492,7 @@ QImage TransferFunctionEditor::getTransferFunctionAsQImage()
 		}
 	}
 
-	framebuffer.release();
+	framebufferObject.release();
 
 	return img;
 }
