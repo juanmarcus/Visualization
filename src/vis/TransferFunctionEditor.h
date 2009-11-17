@@ -46,6 +46,7 @@ public slots:
 
 protected:
 	void createActions();
+	void createMenus();
 
 private:
 	// GeometryDrawer
@@ -53,6 +54,9 @@ private:
 
 	// Actions
 	QAction* addPointAct;
+
+	// Menu
+	QMenu* actionsMenu;
 
 	// Temporary
 	QPoint lastMouseClick;

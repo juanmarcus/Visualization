@@ -15,6 +15,7 @@ TransferFunctionEditor::TransferFunctionEditor(QWidget *parent) :
 	viewOpacity = false;
 
 	createActions();
+	createMenus();
 }
 
 TransferFunctionEditor::~TransferFunctionEditor()
@@ -26,6 +27,13 @@ void TransferFunctionEditor::createActions()
 {
 	addPointAct = new QAction(tr("Add point"), this);
 	connect(addPointAct, SIGNAL(triggered()), this, SLOT(addPointSlot()));
+}
+
+void TransferFunctionEditor::createMenus()
+{
+	actionsMenu = new QMenu();
+
+	actionsMenu->addAction(addPointAct);
 }
 
 void TransferFunctionEditor::init()
@@ -276,7 +284,7 @@ void TransferFunctionEditor::mousePressEvent(QMouseEvent* e)
 
 	lastMouseClick = e->pos();
 
-	if ((e->button() == Qt::RightButton) && (e->modifiers() == Qt::NoButton))
+	if ((e->button() == Qt::LeftButton) && (e->modifiers() == Qt::NoButton))
 	{
 		// Create context menu
 		QMenu contextMenu(this);
@@ -307,8 +315,9 @@ void TransferFunctionEditor::mousePressEvent(QMouseEvent* e)
 		}
 		handled = true;
 	}
-	else if (e->button() == Qt::LeftButton)
+	else if (e->button() == Qt::RightButton)
 	{
+		actionsMenu->exec(e->globalPos());
 		handled = true;
 	}
 
