@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	mdiArea = new QMdiArea();
 	setCentralWidget(mdiArea);
 
-	raycastingViewer = new ibiQRaycastingViewer();
+	raycastingViewer = new RaycastingViewer();
 	mdiArea->addSubWindow(raycastingViewer);
 
 	transferFunctionEditor = new TransferFunctionEditor();

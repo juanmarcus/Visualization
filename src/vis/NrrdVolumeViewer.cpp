@@ -4,7 +4,7 @@
 #include <teem/nrrd.h>
 
 NrrdVolumeViewer::NrrdVolumeViewer(QWidget *parent) :
-	ibiQRaycastingViewer(parent), volume(0)
+	RaycastingViewer(parent), volume(0)
 {
 
 }

@@ -1,13 +1,13 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
-#include "ibi_qt/ibiQRaycastingViewer.h"
+#include "RaycastingViewer.h"
 
 #include <teem/nrrd.h>
 
 using namespace ibi;
 
-class NrrdVolumeViewer: public ibiQRaycastingViewer
+class NrrdVolumeViewer: public RaycastingViewer
 {
 Q_OBJECT
 
