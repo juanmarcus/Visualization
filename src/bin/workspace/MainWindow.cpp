@@ -102,6 +102,8 @@ void MainWindow::createMenus()
 	updateMenu->addAction(applyTransferFunctionAct);
 
 	actionsMenu = menuBar()->addMenu(tr("Actions"));
+
+	windowMenu = menuBar()->addMenu(tr("Window"));
 }
 
 void MainWindow::updateMenus()

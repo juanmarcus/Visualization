@@ -44,6 +44,7 @@ private:
 	QMenu* fileMenu;
 	QMenu* updateMenu;
 	QMenu* actionsMenu;
+	QMenu* windowMenu;
 
 };
 
