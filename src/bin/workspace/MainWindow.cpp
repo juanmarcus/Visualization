@@ -2,6 +2,7 @@
 
 #include <QtGui/QFileDialog>
 #include <QtGui/QMenuBar>
+#include <QtGui/QMdiSubWindow>
 #include <teem/nrrd.h>
 #include "ibi_error/Exception.h"
 
@@ -25,6 +26,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	createActions();
 	createMenus();
+
+	connect(mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this,
+			SLOT(updateMenus()));
 
 }
 
@@ -89,12 +93,35 @@ void MainWindow::createActions()
 
 void MainWindow::createMenus()
 {
-	QMenu* fileMenu = menuBar()->addMenu(tr("File"));
+	fileMenu = menuBar()->addMenu(tr("File"));
 	fileMenu->addAction(openVolumeAct);
 	fileMenu->addSeparator();
 	fileMenu->addAction(exitAct);
 
-	QMenu* updateMenu = menuBar()->addMenu(tr("Update"));
+	updateMenu = menuBar()->addMenu(tr("Update"));
 	updateMenu->addAction(applyTransferFunctionAct);
 
+	actionsMenu = menuBar()->addMenu(tr("Actions"));
+}
+
+void MainWindow::updateMenus()
+{
+	actionsMenu->clear();
+	QMdiSubWindow* window = mdiArea->activeSubWindow();
+	if (window == 0)
+	{
+		actionsMenu->addAction("No window selected");
+	}
+	else
+	{
+		QList<QAction*> actions = window->widget()->actions();
+		if (actions.empty())
+		{
+			actionsMenu->addAction("No actions");
+		}
+		else
+		{
+			actionsMenu->addActions(actions);
+		}
+	}
 }

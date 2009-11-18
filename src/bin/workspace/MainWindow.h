@@ -19,6 +19,7 @@ public:
 public slots:
 	void openVolumeSlot();
 	void applyTransferFunctionSlot();
+	void updateMenus();
 
 private:
 	void createActions();
@@ -38,6 +39,11 @@ private:
 	QAction* exitAct;
 	QAction* openVolumeAct;
 	QAction* applyTransferFunctionAct;
+
+	// Menus
+	QMenu* fileMenu;
+	QMenu* updateMenu;
+	QMenu* actionsMenu;
 
 };
 
