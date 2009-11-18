@@ -39,10 +39,13 @@ public:
 	Texture* getTransferFunctionAsTexture();
 	QImage getTransferFunctionAsQImage();
 public slots:
-	void saveTextureDescription();
-	void loadTextureDescription();
-	void saveTexture();
+	void saveDescriptionSlot();
+	void openDescriptionSlot();
+	void saveTextureSlot();
 	void addPointSlot();
+	void selectColorSlot();
+	void deletePointSlot();
+	void clearSlot();
 
 protected:
 	void createActions();
@@ -54,6 +57,12 @@ private:
 
 	// Actions
 	QAction* addPointAct;
+	QAction* selectColorAct;
+	QAction* deletePointAct;
+	QAction* clearAct;
+	QAction* saveDescriptionAct;
+	QAction* saveTextureAct;
+	QAction* openDescriptionAct;
 
 	// Menu
 	QMenu* actionsMenu;

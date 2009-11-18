@@ -27,6 +27,40 @@ void TransferFunctionEditor::createActions()
 {
 	addPointAct = new QAction(tr("Add point"), this);
 	connect(addPointAct, SIGNAL(triggered()), this, SLOT(addPointSlot()));
+	addAction(addPointAct);
+
+	selectColorAct = new QAction(tr("Select color"), this);
+	selectColorAct->setShortcut(tr("Space"));
+	connect(selectColorAct, SIGNAL(triggered()), this, SLOT(selectColorSlot()));
+	addAction(selectColorAct);
+
+	deletePointAct = new QAction(tr("Delete point"), this);
+	deletePointAct->setShortcut(QKeySequence::Delete);
+	connect(deletePointAct, SIGNAL(triggered()), this, SLOT(deletePointSlot()));
+	addAction(deletePointAct);
+
+	clearAct = new QAction(tr("Clear"), this);
+	clearAct->setShortcut(tr("Ctrl+L"));
+	connect(clearAct, SIGNAL(triggered()), this, SLOT(clearSlot()));
+	addAction(clearAct);
+
+	saveDescriptionAct = new QAction(tr("Save description"), this);
+	saveDescriptionAct->setShortcut(QKeySequence::Save);
+	connect(saveDescriptionAct, SIGNAL(triggered()), this,
+			SLOT(saveDescriptionSlot()));
+	addAction(saveDescriptionAct);
+
+	openDescriptionAct = new QAction(tr("Open description"), this);
+	openDescriptionAct->setShortcut(QKeySequence::Open);
+	connect(openDescriptionAct, SIGNAL(triggered()), this,
+			SLOT(openDescriptionSlot()));
+	addAction(openDescriptionAct);
+
+	saveTextureAct = new QAction(tr("Save to texture"), this);
+	saveTextureAct->setShortcut(tr("Ctrl+T"));
+	connect(saveTextureAct, SIGNAL(triggered()), this, SLOT(saveTextureSlot()));
+	addAction(saveTextureAct);
+
 }
 
 void TransferFunctionEditor::createMenus()
@@ -34,6 +68,12 @@ void TransferFunctionEditor::createMenus()
 	actionsMenu = new QMenu();
 
 	actionsMenu->addAction(addPointAct);
+	actionsMenu->addAction(selectColorAct);
+	actionsMenu->addAction(deletePointAct);
+	actionsMenu->addAction(clearAct);
+	actionsMenu->addAction(saveDescriptionAct);
+	actionsMenu->addAction(saveTextureAct);
+	actionsMenu->addAction(openDescriptionAct);
 }
 
 void TransferFunctionEditor::init()
@@ -160,43 +200,7 @@ void TransferFunctionEditor::keyPressEvent(QKeyEvent *e)
 	const Qt::KeyboardModifiers modifiers = e->modifiers();
 
 	bool handled = false;
-	if ((e->key() == Qt::Key_Space) && (modifiers == Qt::NoButton))
-	{
-		if (selectedPoint != -1)
-		{
-			Vector3 col = controlPoints[selectedPoint].color;
-			QColor orig = QColor::fromRgbF(col.x, col.y, col.z, 1.0);
-
-			QColor color = QColorDialog::getColor(orig, this);
-			if (color.isValid())
-			{
-				col.x = color.redF();
-				col.y = color.greenF();
-				col.z = color.blueF();
-				controlPoints[selectedPoint].color = col;
-			}
-			handled = true;
-		}
-	}
-	else if ((e->key() == Qt::Key_Delete) && (modifiers == Qt::NoButton))
-	{
-		if (selectedPoint != -1)
-		{
-			vector<ControlPoint>::iterator it = controlPoints.begin();
-			vector<ControlPoint>::iterator itEnd = controlPoints.end();
-			for (int i = 0; it != itEnd; ++it, ++i)
-			{
-				if (i == selectedPoint)
-				{
-					controlPoints.erase(it);
-					break;
-				}
-			}
-			selectedPoint = -1;
-			handled = true;
-		}
-	}
-	else if ((e->key() == Qt::Key_Up) && (modifiers == Qt::ShiftModifier))
+	if ((e->key() == Qt::Key_Up) && (modifiers == Qt::ShiftModifier))
 	{
 		if (selectedPoint != -1)
 		{
@@ -240,26 +244,6 @@ void TransferFunctionEditor::keyPressEvent(QKeyEvent *e)
 		{
 			selectedPoint = controlPoints.size() - 1;
 		}
-		handled = true;
-	}
-	else if ((e->key() == Qt::Key_L) && (modifiers == Qt::ControlModifier))
-	{
-		controlPoints.clear();
-		handled = true;
-	}
-	else if ((e->key() == Qt::Key_S) && (modifiers == Qt::ControlModifier))
-	{
-		saveTextureDescription();
-		handled = true;
-	}
-	else if ((e->key() == Qt::Key_T) && (modifiers == Qt::ControlModifier))
-	{
-		saveTexture();
-		handled = true;
-	}
-	else if ((e->key() == Qt::Key_O) && (modifiers == Qt::ControlModifier))
-	{
-		loadTextureDescription();
 		handled = true;
 	}
 	else if ((e->key() == Qt::Key_O) && (modifiers == Qt::NoModifier))
@@ -327,7 +311,7 @@ void TransferFunctionEditor::mousePressEvent(QMouseEvent* e)
 	}
 }
 
-void TransferFunctionEditor::loadTextureDescription()
+void TransferFunctionEditor::openDescriptionSlot()
 {
 	QString filename = QFileDialog::getOpenFileName(this, "Open", ".", "*.txt");
 	if (!filename.isEmpty())
@@ -353,11 +337,12 @@ void TransferFunctionEditor::loadTextureDescription()
 				controlPoints.push_back(ControlPoint(point, color));
 			}
 			in.close();
+			updateGL();
 		}
 	}
 }
 
-void TransferFunctionEditor::saveTextureDescription()
+void TransferFunctionEditor::saveDescriptionSlot()
 {
 	QString filename = QFileDialog::getSaveFileName(this, "Save", ".", "*.txt");
 	if (!filename.isEmpty())
@@ -506,7 +491,7 @@ QImage TransferFunctionEditor::getTransferFunctionAsQImage()
 	return img;
 }
 
-void TransferFunctionEditor::saveTexture()
+void TransferFunctionEditor::saveTextureSlot()
 {
 	if (controlPoints.size() < 2)
 	{
@@ -543,5 +528,49 @@ void TransferFunctionEditor::addPointSlot()
 	controlPoints.push_back(ControlPoint(point));
 	sort(controlPoints.begin(), controlPoints.end(), comp);
 	selectedPoint = -1;
+	updateGL();
+}
+
+void TransferFunctionEditor::selectColorSlot()
+{
+	if (selectedPoint != -1)
+	{
+		Vector3 col = controlPoints[selectedPoint].color;
+		QColor orig = QColor::fromRgbF(col.x, col.y, col.z, 1.0);
+
+		QColor color = QColorDialog::getColor(orig, this);
+		if (color.isValid())
+		{
+			col.x = color.redF();
+			col.y = color.greenF();
+			col.z = color.blueF();
+			controlPoints[selectedPoint].color = col;
+		}
+		updateGL();
+	}
+}
+
+void TransferFunctionEditor::deletePointSlot()
+{
+	if (selectedPoint != -1)
+	{
+		vector<ControlPoint>::iterator it = controlPoints.begin();
+		vector<ControlPoint>::iterator itEnd = controlPoints.end();
+		for (int i = 0; it != itEnd; ++it, ++i)
+		{
+			if (i == selectedPoint)
+			{
+				controlPoints.erase(it);
+				break;
+			}
+		}
+		selectedPoint = -1;
+		updateGL();
+	}
+}
+
+void TransferFunctionEditor::clearSlot()
+{
+	controlPoints.clear();
 	updateGL();
 }
