@@ -9,7 +9,7 @@
 #include "ibi_cmdline/CommandLineParser.h"
 #include <QtGui/QApplication>
 #include <teem/nrrd.h>
-#include "NrrdVolumeViewer.h"
+#include "RaycastingViewer.h"
 
 int main(int argc, char **argv)
 {
@@ -44,12 +44,11 @@ int main(int argc, char **argv)
 	QApplication app(argc, argv);
 
 	// Create a Viewer
-	NrrdVolumeViewer w;
-	w.setVolumeNrrd(nin);
-	w.setTransferFunctionFilename(txf_func_filename);
+	RaycastingViewer w;
 
 	// Show the widget
 	w.showMaximized();
+
 	// Run the application loop
 	return app.exec();
 }

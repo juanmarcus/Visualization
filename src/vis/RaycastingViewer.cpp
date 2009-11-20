@@ -1,6 +1,9 @@
 #include "RaycastingViewer.h"
 
 #include "ibi_geometry/Vector3.h"
+#include "ibi_error/Exception.h"
+#include <QtGui/QFileDialog>
+#include <QtGui/QAction>
 #include <iostream>
 
 using namespace std;
@@ -10,10 +13,13 @@ RaycastingViewer::RaycastingViewer(QWidget *parent) :
 {
 	toggle_visuals = true;
 	stepsize = 1.0 / 100.0;
-	volume = 0;
+	volume_texture = 0;
 	transfer_function = 0;
 
 	setDesiredAspectRatio(1.0);
+
+	createActions();
+	createMenus();
 }
 
 RaycastingViewer::~RaycastingViewer()
@@ -33,8 +39,6 @@ void RaycastingViewer::init()
 	showEntireScene();
 	setDesiredAspectRatio(1.0);
 
-	// Call user initialization
-	initRaycasting();
 }
 
 void RaycastingViewer::initGlew()
@@ -110,11 +114,6 @@ void RaycastingViewer::initFramebuffer()
 
 	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-
-}
-
-void RaycastingViewer::initRaycasting()
-{
 
 }
 
@@ -205,7 +204,7 @@ void RaycastingViewer::raycasting_pass()
 	cgGLSetParameter1f(stepsize_param.cgparameter, stepsize);
 
 	backface_texture_param.setTexture(backface);
-	volume_texture_param.setTexture(volume);
+	volume_texture_param.setTexture(volume_texture);
 	transfer_function_param.setTexture(transfer_function);
 
 	glCullFace(GL_BACK);
@@ -244,7 +243,7 @@ void RaycastingViewer::render_buffer_to_screen()
 void RaycastingViewer::draw()
 {
 	// do not draw if volume or transfer function not set
-	if (!this->volume)
+	if (!this->volume_texture)
 	{
 		return;
 	}
@@ -263,13 +262,20 @@ void RaycastingViewer::draw()
 	render_buffer_to_screen();
 }
 
-void RaycastingViewer::setVolume(Texture* t)
+void RaycastingViewer::setVolume(Nrrd* nin)
 {
-	if (this->volume)
-	{
-		delete this->volume;
-	}
-	this->volume = t;
+	this->volume = nin;
+
+	// Prepare loading info for nrrd volume
+	TextureLoadingInfo info;
+	info.target = GL_TEXTURE_3D;
+	info.texture_type = "nrrd3D";
+	info.options["nrrd"] = this->volume;
+
+	// Load volume texture
+	Texture* volumeTexture = loadTexture(info);
+	this->volume_texture = volumeTexture;
+
 }
 
 void RaycastingViewer::setTransferFunction(Texture* t)
@@ -294,4 +300,47 @@ void RaycastingViewer::setTransferFunction(QImage img)
 	setTransferFunction(t);
 
 	t->disable();
+}
+
+void RaycastingViewer::openVolumeSlot()
+{
+	QString filename = QFileDialog::getOpenFileName(this, "Open volume", ".",
+			"*.nhdr");
+	if (!filename.isEmpty())
+	{
+		Nrrd* nin = nrrdNew();
+		if (nrrdLoad(nin, filename.toStdString().c_str(), 0))
+		{
+			char* err = biffGetDone(NRRD);
+			throw Exception("RaycastingViewer.cpp", "Problem loading nrrd.",
+					"File not found: " + filename.toStdString());
+		}
+
+		setVolume(nin);
+	}
+}
+
+void RaycastingViewer::openTransferFunctionSlot()
+{
+	QString filename = QFileDialog::getOpenFileName(this,
+			"Open transfer function", ".", "*.png");
+	if (!filename.isEmpty())
+	{
+		QImage img(filename);
+
+		setTransferFunction(img);
+	}
+}
+
+void RaycastingViewer::createActions()
+{
+	openVolumeAct = new QAction(tr("Open volume"), this);
+	openVolumeAct->setShortcut(QKeySequence::Open);
+	connect(openVolumeAct, SIGNAL(triggered()), this, SLOT(openVolumeSlot()));
+	addAction(openVolumeAct);
+}
+
+void RaycastingViewer::createMenus()
+{
+
 }

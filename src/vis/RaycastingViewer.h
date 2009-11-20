@@ -10,6 +10,7 @@
 #include "ibi_texturemanager/TextureManager.h"
 #include "ibi_gpuprogrammanager/GPUProgramManager.h"
 #include "ibi_gl/FramebufferObject.h"
+#include <teem/nrrd.h>
 
 using namespace ibi;
 
@@ -27,11 +28,16 @@ public:
 	void initFramebuffer();
 	void draw();
 
-	virtual void initRaycasting();
-
-	void setVolume(Texture* t);
+	void setVolume(Nrrd* nin);
 	void setTransferFunction(Texture* t);
 	void setTransferFunction(QImage img);
+public slots:
+	void openVolumeSlot();
+	void openTransferFunctionSlot();
+
+private:
+	void createActions();
+	void createMenus();
 
 private:
 	//draw geometry
@@ -49,8 +55,11 @@ private:
 
 	bool toggle_visuals;
 
+	// Volume data
+	Nrrd* volume;
+
 	// Textures
-	Texture* volume;
+	Texture* volume_texture;
 	Texture* backface;
 	Texture* final_image;
 	Texture* transfer_function;
@@ -66,6 +75,9 @@ private:
 
 	// Framebuffer object
 	FramebufferObject framebufferObject;
+
+	// Actions
+	QAction* openVolumeAct;
 };
 
 #endif // RAYCASTINGVIEWER_H

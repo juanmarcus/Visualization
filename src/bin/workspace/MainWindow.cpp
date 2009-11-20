@@ -37,33 +37,6 @@ MainWindow::~MainWindow()
 
 }
 
-void MainWindow::openVolumeSlot()
-{
-	QString filename = QFileDialog::getOpenFileName(this, "Open volume",
-			"data", "*.nhdr");
-	if (!filename.isEmpty())
-	{
-		Nrrd* nin = nrrdNew();
-		if (nrrdLoad(nin, filename.toStdString().c_str(), NULL))
-		{
-			char* err = biffGetDone(NRRD);
-			throw Exception("MainWindow.cpp", "Problem loading nrrd", err);
-		}
-
-		// Prepare loading info for nrrd volume
-		TextureLoadingInfo info;
-		info.target = GL_TEXTURE_3D;
-		info.texture_type = "nrrd3D";
-		info.options["nrrd"] = nin;
-
-		// Load volume texture
-		Texture* volumeTexture = raycastingViewer->loadTexture(info);
-
-		// Set the texture
-		raycastingViewer->setVolume(volumeTexture);
-	}
-}
-
 void MainWindow::applyTransferFunctionSlot()
 {
 	QImage img = transferFunctionEditor->getTransferFunctionAsQImage();
@@ -82,9 +55,6 @@ void MainWindow::createActions()
 	exitAct = new QAction(tr("Exit"), this);
 	connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
 
-	openVolumeAct = new QAction(tr("Open volume"), this);
-	connect(openVolumeAct, SIGNAL(triggered()), this, SLOT(openVolumeSlot()));
-
 	applyTransferFunctionAct = new QAction(tr("Apply Transfer Function"), this);
 	connect(applyTransferFunctionAct, SIGNAL(triggered()), this,
 			SLOT(applyTransferFunctionSlot()));
@@ -94,7 +64,6 @@ void MainWindow::createActions()
 void MainWindow::createMenus()
 {
 	fileMenu = menuBar()->addMenu(tr("File"));
-	fileMenu->addAction(openVolumeAct);
 	fileMenu->addSeparator();
 	fileMenu->addAction(exitAct);
 

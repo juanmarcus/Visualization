@@ -17,7 +17,6 @@ public:
 	~MainWindow();
 
 public slots:
-	void openVolumeSlot();
 	void applyTransferFunctionSlot();
 	void updateMenus();
 
@@ -37,7 +36,6 @@ private:
 
 	// Actions
 	QAction* exitAct;
-	QAction* openVolumeAct;
 	QAction* applyTransferFunctionAct;
 
 	// Menus

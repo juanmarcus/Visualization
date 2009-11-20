@@ -4,7 +4,6 @@ FILE (GLOB_RECURSE sources "*.cpp")
 FILE (GLOB_RECURSE headers "*.h")
 
 SET (moc_headers
-    NrrdVolumeViewer.h
     TransferFunctionEditor.h
     RaycastingViewer.h
 )
