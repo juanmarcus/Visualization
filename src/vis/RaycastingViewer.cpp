@@ -89,6 +89,7 @@ void RaycastingViewer::initFramebuffer()
 
 	// Start texture manager
 	loadPlugin("../ibi/build/lib/libtexture_loader_empty.so");
+	loadPlugin("../ibi/build/lib/libtexture_loader_nrrd3D.so");
 
 	// Render textures specifications
 	TextureLoadingInfo info;
