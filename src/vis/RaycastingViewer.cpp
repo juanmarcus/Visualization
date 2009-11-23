@@ -339,6 +339,12 @@ void RaycastingViewer::createActions()
 	openVolumeAct->setShortcut(QKeySequence::Open);
 	connect(openVolumeAct, SIGNAL(triggered()), this, SLOT(openVolumeSlot()));
 	addAction(openVolumeAct);
+
+	openTransferFunctionAct = new QAction(tr("Open transfer function"), this);
+	openTransferFunctionAct->setShortcut(tr("Ctrl+T"));
+	connect(openTransferFunctionAct, SIGNAL(triggered()), this,
+			SLOT(openTransferFunctionSlot()));
+	addAction(openTransferFunctionAct);
 }
 
 void RaycastingViewer::createMenus()

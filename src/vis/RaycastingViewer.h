@@ -78,6 +78,7 @@ private:
 
 	// Actions
 	QAction* openVolumeAct;
+	QAction* openTransferFunctionAct;
 };
 
 #endif // RAYCASTINGVIEWER_H
