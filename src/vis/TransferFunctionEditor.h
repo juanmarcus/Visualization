@@ -4,7 +4,6 @@
 #include "ibi_qt/ibiQGLViewer.h"
 #include <list>
 #include "ibi_gl/Texture.h"
-#include "ibi_texturemanager/TextureManager.h"
 #include "ibi_geometry/Vector3.h"
 #include "ibi_gl/GeometryDrawer2D.h"
 #include "QtGui/QMenu"

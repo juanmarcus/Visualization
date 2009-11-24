@@ -5,6 +5,8 @@
 #include <QtGui/QFileDialog>
 #include <QtGui/QAction>
 #include <iostream>
+#include "ibi_qt/TextureConfigurator_Qt.h"
+#include "TextureConfigurator_Nrrd.h"
 
 using namespace std;
 
@@ -87,19 +89,13 @@ void RaycastingViewer::initFramebuffer()
 	// Start framebuffer
 	framebufferObject.init();
 
-	// Start texture manager
-	loadPlugin("../ibi/build/lib/libtexture_loader_empty.so");
-	loadPlugin("../ibi/build/lib/libtexture_loader_nrrd3D.so");
-
 	// Render textures specifications
 	TextureLoadingInfo info;
-	info.target = GL_TEXTURE_2D;
-	info.texture_type = "empty";
-	info.options["width"] = 800;
-	info.options["height"] = 800;
-	info.options["internalformat"] = GL_RGBA16F_ARB;
-	info.options["format"] = GL_RGBA;
-	info.options["type"] = GL_FLOAT;
+	info.width = 800;
+	info.height = 800;
+	info.internalformat = GL_RGBA16F_ARB;
+	info.format = GL_RGBA;
+	info.type = GL_FLOAT;
 
 	// Backface
 	backface = loadTexture(info);
@@ -267,14 +263,10 @@ void RaycastingViewer::setVolume(Nrrd* nin)
 {
 	this->volume = nin;
 
-	// Prepare loading info for nrrd volume
-	TextureLoadingInfo info;
-	info.target = GL_TEXTURE_3D;
-	info.texture_type = "nrrd3D";
-	info.options["nrrd"] = this->volume;
-
 	// Load volume texture
+	TextureLoadingInfo info = TextureConfigurator_Nrrd::fromNrrd3D(nin);
 	Texture* volumeTexture = loadTexture(info);
+
 	this->volume_texture = volumeTexture;
 
 }
@@ -286,21 +278,10 @@ void RaycastingViewer::setTransferFunction(Texture* t)
 
 void RaycastingViewer::setTransferFunction(QImage img)
 {
-	makeCurrent();
+	TextureLoadingInfo info = TextureConfigurator_Qt::fromQImage1D(img);
+	Texture* t = loadTexture(info);
 
-	QImage imggl = QGLWidget::convertToGLFormat(img);
-	Texture* t = new Texture();
-	t->setTarget(GL_TEXTURE_1D);
-	t->init();
-	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-
-	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, imggl.width(), 0, GL_RGBA,
-			GL_UNSIGNED_BYTE, imggl.bits());
-
-	t->setDimensions(imggl.width());
 	setTransferFunction(t);
-
-	t->disable();
 }
 
 void RaycastingViewer::openVolumeSlot()

@@ -2,17 +2,16 @@
 #define VIEWER_H
 
 #include "ibi_gl/ibi_gl.h"
-#include <QGLViewer/qglviewer.h>
-#include "ibi_geometry/Ray.h"
 #include "ibi_gl/GLMode2D.h"
 #include "ibi_gl/GeometryDrawer.h"
+#include "ibi_geometry/Ray.h"
 #include "ibi_geometry/AxisAlignedBox.h"
-#include "ibi_texturemanager/TextureManager.h"
+#include "ibi_qt/ibiQGLViewer.h"
 #include "Sampler.h"
 
 using namespace ibi;
 
-class Viewer: public QGLViewer
+class Viewer: public ibiQGLViewer
 {
 Q_OBJECT
 
@@ -23,9 +22,6 @@ public:
 	void init();
 	void draw();
 private:
-	// Textures
-	TextureManager* textureManager;
-
 	// drawing
 	GeometryDrawer drawer;
 	GLMode2D mode2d;

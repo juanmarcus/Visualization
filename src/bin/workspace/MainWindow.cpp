@@ -19,11 +19,6 @@ MainWindow::MainWindow(QWidget *parent) :
 	transferFunctionEditor = new TransferFunctionEditor();
 	mdiArea->addSubWindow(transferFunctionEditor);
 
-	// Initialize plugins
-	raycastingViewer->loadPlugin("../ibi/build/lib/libtexture_loader_nrrd3D.so");
-	raycastingViewer->loadPlugin(
-			"../ibi/build/lib/libtexture_loader_transfer_func.so");
-
 	createActions();
 	createMenus();
 

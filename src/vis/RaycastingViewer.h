@@ -7,7 +7,6 @@
 #include "Cg/cgGL.h"
 #include "ibi_qt/ibiQGLViewer.h"
 #include "ibi_gl/Texture.h"
-#include "ibi_texturemanager/TextureManager.h"
 #include "ibi_gpuprogrammanager/GPUProgramManager.h"
 #include "ibi_gl/FramebufferObject.h"
 #include <teem/nrrd.h>

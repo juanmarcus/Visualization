@@ -3,13 +3,15 @@
 #include "ibi_geometry/Transform.h"
 #include "ibi_geometry/Matrix4.h"
 #include "ibi_gl/Texture.h"
+#include "ibi_gl/TextureLoadingInfo.h"
 #include "ibi_geometry/Intersection.h"
 #include "ibi_interpolation/Interpolation.h"
+#include "TextureConfigurator_Nrrd.h"
 
 using namespace qglviewer;
 
 Viewer::Viewer(QWidget *parent) :
-	QGLViewer(parent)
+	ibiQGLViewer(parent)
 {
 }
 
@@ -40,8 +42,6 @@ void Viewer::init()
 	sampler.setNrrd(nin);
 	sampler.update();
 
-	textureManager = TextureManager::getInstance();
-	textureManager->loadPlugin("../ibi/build/lib/libtexture_loader_nrrd.so");
 }
 
 void Viewer::draw()
@@ -130,11 +130,8 @@ void Viewer::draw()
 		nrrdRangeNix(range);
 
 		// Create a texture from the histogram
-		TextureLoadingInfo info;
-		info.target = GL_TEXTURE_2D;
-		info.texture_type = "nrrd";
-		info.options["nrrd"] = dhist;
-		Texture* t = textureManager->load(info);
+		TextureLoadingInfo info = TextureConfigurator_Nrrd::fromNrrd2D(dhist);
+		Texture* t = loadTexture(info);
 
 		// Show texture
 		mode2d.enable();

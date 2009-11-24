@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "ibi_qt/ibiQGLViewer.h"
+#include "TextureConfigurator_Nrrd.h"
 
 using namespace std;
 using namespace ibi;
@@ -31,8 +32,6 @@ public:
 		glClearColor(0.0, 0.0, 0.0, 1.0);
 		textures.resize(nin->axis[axis].size, NULL);
 		range = nrrdRangeNewSet(nin, 0);
-
-		loadPlugin("../ibi/build/lib/libtexture_loader_nrrd.so");
 
 		setDesiredAspectRatio(1.0);
 	}
@@ -63,11 +62,7 @@ public:
 			Nrrd* nout = nrrdNew();
 			nrrdQuantize(nout, slice, range, 8);
 
-			TextureLoadingInfo info;
-			info.texture_type = "nrrd";
-			info.target = GL_TEXTURE_2D;
-			info.options["nrrd"] = nout;
-
+			TextureLoadingInfo info = TextureConfigurator_Nrrd::fromNrrd2D(nout);
 			Texture* t = loadTexture(info);
 
 			textures[n] = t;

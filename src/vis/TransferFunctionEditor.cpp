@@ -80,8 +80,6 @@ void TransferFunctionEditor::init()
 {
 	// Init glew
 	//	glewInit();
-	loadPlugin("../ibi/build/lib/libtexture_loader_empty.so");
-
 	glDisable(GL_BLEND);
 
 	setDesiredAspectRatio(4.0);
@@ -384,12 +382,11 @@ Texture* TransferFunctionEditor::getTransferFunctionAsTexture()
 	// Create target texture
 	TextureLoadingInfo info;
 	info.target = GL_TEXTURE_2D;
-	info.texture_type = "empty";
-	info.options["width"] = textureWidth;
-	info.options["height"] = textureHeight;
-	info.options["internalformat"] = GL_RGBA;
-	info.options["format"] = GL_RGBA;
-	info.options["type"] = GL_FLOAT;
+	info.width = textureWidth;
+	info.height = textureHeight;
+	info.internalformat = GL_RGBA;
+	info.format = GL_RGBA;
+	info.type = GL_FLOAT;
 	Texture* renderTarget = loadTexture(info);
 
 	// Create the framebuffer and start rendering
