@@ -15,6 +15,7 @@ RaycastingViewer::RaycastingViewer(QWidget *parent) :
 {
 	toggle_visuals = true;
 	stepsize = 1.0 / 100.0;
+	volume = 0;
 	volume_texture = 0;
 	transfer_function = 0;
 
