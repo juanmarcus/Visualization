@@ -30,6 +30,7 @@ public:
 	void setVolume(Nrrd* nin);
 	void setTransferFunction(Texture* t);
 	void setTransferFunction(QImage img);
+
 public slots:
 	void openVolumeSlot();
 	void openTransferFunctionSlot();
@@ -38,7 +39,7 @@ private:
 	void createActions();
 	void createMenus();
 
-private:
+protected:
 	//draw geometry
 	void vertex(float x, float y, float z);
 	void drawQuads(float x, float y, float z);
@@ -56,6 +57,7 @@ private:
 
 	// Volume data
 	Nrrd* volume;
+	NrrdRange* volume_range;
 
 	// Textures
 	Texture* volume_texture;

@@ -16,10 +16,9 @@ RaycastingViewer::RaycastingViewer(QWidget *parent) :
 	toggle_visuals = true;
 	stepsize = 1.0 / 100.0;
 	volume = 0;
+	volume_range = 0;
 	volume_texture = 0;
 	transfer_function = 0;
-
-	setDesiredAspectRatio(1.0);
 
 	createActions();
 	createMenus();
@@ -38,7 +37,7 @@ void RaycastingViewer::init()
 
 	// Set some rendering parameters
 	glDisable(GL_LIGHTING);
-	setSceneRadius(0.65);
+	setSceneRadius(0.8);
 	showEntireScene();
 	setDesiredAspectRatio(1.0);
 
@@ -268,6 +267,14 @@ void RaycastingViewer::setVolume(Nrrd* nin)
 	Texture* volumeTexture = loadTexture(info);
 
 	this->volume_texture = volumeTexture;
+
+	if (volume_range)
+	{
+		nrrdRangeNix(volume_range);
+	}
+
+	// Determine volume range
+	volume_range = nrrdRangeNewSet(nin, 0);
 
 }
 
