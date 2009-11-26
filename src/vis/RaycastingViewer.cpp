@@ -14,7 +14,7 @@ RaycastingViewer::RaycastingViewer(QWidget *parent) :
 	ibiQGLViewer(parent)
 {
 	toggle_visuals = true;
-	stepsize = 1.0 / 100.0;
+	stepsize = 1.0 / 200.0;
 	volume = 0;
 	volume_range = 0;
 	volume_texture = 0;
@@ -266,6 +266,12 @@ void RaycastingViewer::setVolume(Nrrd* nin)
 	TextureLoadingInfo info = TextureConfigurator_Nrrd::fromNrrd3D(nin);
 	Texture* volumeTexture = loadTexture(info);
 
+	volumeTexture->enable();
+	glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP);
+	volumeTexture->disable();
+
 	this->volume_texture = volumeTexture;
 
 	if (volume_range)
@@ -281,6 +287,10 @@ void RaycastingViewer::setVolume(Nrrd* nin)
 void RaycastingViewer::setTransferFunction(Texture* t)
 {
 	this->transfer_function = t;
+
+	t->enable();
+	glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	t->disable();
 }
 
 void RaycastingViewer::setTransferFunction(QImage img)
