@@ -245,6 +245,8 @@ void RaycastingViewer::draw()
 		return;
 	}
 
+	glPushMatrix();
+
 	glTranslatef(-0.5, -0.5, -0.5); // center the texture cube
 
 	render_backface();
@@ -252,6 +254,8 @@ void RaycastingViewer::draw()
 	raycasting_pass();
 
 	render_buffer_to_screen();
+
+	glPopMatrix();
 }
 
 void RaycastingViewer::setVolume(Nrrd* nin)
