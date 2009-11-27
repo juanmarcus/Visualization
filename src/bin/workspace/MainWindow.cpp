@@ -13,8 +13,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	mdiArea = new QMdiArea();
 	setCentralWidget(mdiArea);
 
-	raycastingViewer = new RaycastingViewer();
-	mdiArea->addSubWindow(raycastingViewer);
+	nrrdViewer = new NrrdViewer();
+	mdiArea->addSubWindow(nrrdViewer);
 
 	transferFunctionEditor = new TransferFunctionEditor();
 	mdiArea->addSubWindow(transferFunctionEditor);
@@ -41,7 +41,7 @@ void MainWindow::applyTransferFunctionSlot()
 		return;
 	}
 
-	raycastingViewer->setTransferFunction(img);
+	nrrdViewer->setTransferFunction(img);
 
 }
 

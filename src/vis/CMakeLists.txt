@@ -6,6 +6,7 @@ FILE (GLOB_RECURSE headers "*.h")
 SET (moc_headers
     TransferFunctionEditor.h
     RaycastingViewer.h
+    NrrdViewer.h
 )
 
 QT4_WRAP_CPP (moc_sources ${moc_headers})

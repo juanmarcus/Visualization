@@ -74,7 +74,7 @@ fragment_out fragment_main( vertex_fragment IN,
     {
       value = tex3D(volume_tex,vec).a;
       color_sample = tex1D(txf_func,value);
-      alpha_sample = 1 - exp(-stepsize * color_sample.a);
+      alpha_sample = 1 - exp(-stepsize * 4 * color_sample.a);
       //float v1 = 0.6;
       //float v2 = 0.7;
       

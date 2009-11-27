@@ -3,7 +3,7 @@
 
 #include <QtGui/QMainWindow>
 #include <QtGui/QMdiArea>
-#include "RaycastingViewer.h"
+#include "NrrdViewer.h"
 #include "TransferFunctionEditor.h"
 
 using namespace ibi;
@@ -29,7 +29,7 @@ private:
 	QMdiArea* mdiArea;
 
 	// Volume viewer
-	RaycastingViewer* raycastingViewer;
+	NrrdViewer* nrrdViewer;
 
 	// Transfer function editor
 	TransferFunctionEditor* transferFunctionEditor;

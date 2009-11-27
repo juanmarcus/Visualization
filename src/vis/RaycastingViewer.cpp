@@ -14,11 +14,11 @@ RaycastingViewer::RaycastingViewer(QWidget *parent) :
 	ibiQGLViewer(parent)
 {
 	toggle_visuals = true;
-	stepsize = 1.0 / 100.0;
+	stepsize = 1.0 / 200.0;
+	volume = 0;
+	volume_range = 0;
 	volume_texture = 0;
 	transfer_function = 0;
-
-	setDesiredAspectRatio(1.0);
 
 	createActions();
 	createMenus();
@@ -37,7 +37,7 @@ void RaycastingViewer::init()
 
 	// Set some rendering parameters
 	glDisable(GL_LIGHTING);
-	setSceneRadius(0.65);
+	setSceneRadius(0.8);
 	showEntireScene();
 	setDesiredAspectRatio(1.0);
 
@@ -245,6 +245,8 @@ void RaycastingViewer::draw()
 		return;
 	}
 
+	glPushMatrix();
+
 	glTranslatef(-0.5, -0.5, -0.5); // center the texture cube
 
 	render_backface();
@@ -252,6 +254,8 @@ void RaycastingViewer::draw()
 	raycasting_pass();
 
 	render_buffer_to_screen();
+
+	glPopMatrix();
 }
 
 void RaycastingViewer::setVolume(Nrrd* nin)
@@ -262,13 +266,31 @@ void RaycastingViewer::setVolume(Nrrd* nin)
 	TextureLoadingInfo info = TextureConfigurator_Nrrd::fromNrrd3D(nin);
 	Texture* volumeTexture = loadTexture(info);
 
+	volumeTexture->enable();
+	glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP);
+	volumeTexture->disable();
+
 	this->volume_texture = volumeTexture;
+
+	if (volume_range)
+	{
+		nrrdRangeNix(volume_range);
+	}
+
+	// Determine volume range
+	volume_range = nrrdRangeNewSet(nin, 0);
 
 }
 
 void RaycastingViewer::setTransferFunction(Texture* t)
 {
 	this->transfer_function = t;
+
+	t->enable();
+	glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	t->disable();
 }
 
 void RaycastingViewer::setTransferFunction(QImage img)
