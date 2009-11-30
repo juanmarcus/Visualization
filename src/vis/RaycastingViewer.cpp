@@ -14,7 +14,8 @@ RaycastingViewer::RaycastingViewer(QWidget *parent) :
 	ibiQGLViewer(parent)
 {
 	toggle_visuals = true;
-	stepsize = 1.0 / 200.0;
+	mult_factor = 3.0;
+	stepsize = 1.0 / 100.0;
 	volume = 0;
 	volume_range = 0;
 	volume_texture = 0;
@@ -77,6 +78,7 @@ void RaycastingViewer::initCG()
 	volume_texture_param = fragmentProgram->getNamedParameter("volume_tex");
 	transfer_function_param = fragmentProgram->getNamedParameter("txf_func");
 	stepsize_param = fragmentProgram->getNamedParameter("stepsize");
+	mult_factor_param = fragmentProgram->getNamedParameter("mult_factor");
 }
 
 void RaycastingViewer::initFramebuffer()
@@ -194,6 +196,7 @@ void RaycastingViewer::raycasting_pass()
 	fragmentProgram->enable();
 
 	cgGLSetParameter1f(stepsize_param.cgparameter, stepsize);
+	cgGLSetParameter1f(mult_factor_param.cgparameter, mult_factor);
 
 	backface_texture_param.setTexture(backface);
 	volume_texture_param.setTexture(volume_texture);
@@ -331,6 +334,24 @@ void RaycastingViewer::openTransferFunctionSlot()
 	}
 }
 
+void RaycastingViewer::setMultiplicativeFactorSlot(float value)
+{
+	this->mult_factor = value;
+	updateGL();
+}
+
+void RaycastingViewer::incMultiplicativeFactorSlot()
+{
+	mult_factor += 0.1;
+	updateGL();
+}
+
+void RaycastingViewer::decMultiplicativeFactorSlot()
+{
+	mult_factor -= 0.1;
+	updateGL();
+}
+
 void RaycastingViewer::createActions()
 {
 	openVolumeAct = new QAction(tr("Open volume"), this);
@@ -343,6 +364,20 @@ void RaycastingViewer::createActions()
 	connect(openTransferFunctionAct, SIGNAL(triggered()), this,
 			SLOT(openTransferFunctionSlot()));
 	addAction(openTransferFunctionAct);
+
+	incMultiplicativeFactorAct = new QAction(tr(
+			"Increase multiplicative factor"), this);
+	incMultiplicativeFactorAct->setShortcut(tr("Ctrl+Up"));
+	connect(incMultiplicativeFactorAct, SIGNAL(triggered()), this,
+			SLOT(incMultiplicativeFactorSlot()));
+	addAction(incMultiplicativeFactorAct);
+
+	decMultiplicativeFactorAct = new QAction(tr(
+			"Increase multiplicative factor"), this);
+	decMultiplicativeFactorAct->setShortcut(tr("Ctrl+Down"));
+	connect(decMultiplicativeFactorAct, SIGNAL(triggered()), this,
+			SLOT(decMultiplicativeFactorSlot()));
+	addAction(decMultiplicativeFactorAct);
 }
 
 void RaycastingViewer::createMenus()
