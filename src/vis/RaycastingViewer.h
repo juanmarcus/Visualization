@@ -34,19 +34,28 @@ public:
 public slots:
 	void openVolumeSlot();
 	void openTransferFunctionSlot();
+	void setMultiplicativeFactorSlot(float value);
+	void incMultiplicativeFactorSlot();
+	void decMultiplicativeFactorSlot();
 
 private:
 	void createActions();
 	void createMenus();
 
 protected:
-	//draw geometry
+	// Draw geometry
 	void vertex(float x, float y, float z);
 	void drawQuads(float x, float y, float z);
-	//raycasting methods
+
+	// Raycasting methods
 	void render_backface();
 	void raycasting_pass();
 	void render_buffer_to_screen();
+
+	/*
+	 * Multiplicative factor
+	 */
+	float mult_factor;
 
 	/*
 	 * Distance between samples in a ray.
@@ -73,6 +82,7 @@ protected:
 	FragmentProgram::Parameter volume_texture_param;
 	FragmentProgram::Parameter transfer_function_param;
 	FragmentProgram::Parameter stepsize_param;
+	FragmentProgram::Parameter mult_factor_param;
 
 	// Framebuffer object
 	FramebufferObject framebufferObject;
@@ -80,6 +90,8 @@ protected:
 	// Actions
 	QAction* openVolumeAct;
 	QAction* openTransferFunctionAct;
+	QAction* incMultiplicativeFactorAct;
+	QAction* decMultiplicativeFactorAct;
 };
 
 #endif // RAYCASTINGVIEWER_H
