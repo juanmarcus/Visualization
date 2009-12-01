@@ -55,7 +55,7 @@ protected:
 	/*
 	 * Multiplicative factor
 	 */
-	float mult_factor;
+	float opacity;
 
 	/*
 	 * Distance between samples in a ray.
@@ -82,7 +82,7 @@ protected:
 	FragmentProgram::Parameter volume_texture_param;
 	FragmentProgram::Parameter transfer_function_param;
 	FragmentProgram::Parameter stepsize_param;
-	FragmentProgram::Parameter mult_factor_param;
+	FragmentProgram::Parameter opacity_param;
 
 	// Framebuffer object
 	FramebufferObject framebufferObject;
