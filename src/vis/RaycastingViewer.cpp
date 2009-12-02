@@ -14,7 +14,7 @@ RaycastingViewer::RaycastingViewer(QWidget *parent) :
 	ibiQGLViewer(parent)
 {
 	toggle_visuals = true;
-	mult_factor = 3.0;
+	opacity = 3.0;
 	stepsize = 1.0 / 100.0;
 	volume = 0;
 	volume_range = 0;
@@ -78,7 +78,7 @@ void RaycastingViewer::initCG()
 	volume_texture_param = fragmentProgram->getNamedParameter("volume_tex");
 	transfer_function_param = fragmentProgram->getNamedParameter("txf_func");
 	stepsize_param = fragmentProgram->getNamedParameter("stepsize");
-	mult_factor_param = fragmentProgram->getNamedParameter("mult_factor");
+	opacity_param = fragmentProgram->getNamedParameter("opacity");
 }
 
 void RaycastingViewer::initFramebuffer()
@@ -196,7 +196,7 @@ void RaycastingViewer::raycasting_pass()
 	fragmentProgram->enable();
 
 	cgGLSetParameter1f(stepsize_param.cgparameter, stepsize);
-	cgGLSetParameter1f(mult_factor_param.cgparameter, mult_factor);
+	cgGLSetParameter1f(opacity_param.cgparameter, opacity);
 
 	backface_texture_param.setTexture(backface);
 	volume_texture_param.setTexture(volume_texture);
@@ -336,19 +336,19 @@ void RaycastingViewer::openTransferFunctionSlot()
 
 void RaycastingViewer::setMultiplicativeFactorSlot(float value)
 {
-	this->mult_factor = value;
+	this->opacity = value;
 	updateGL();
 }
 
 void RaycastingViewer::incMultiplicativeFactorSlot()
 {
-	mult_factor += 0.1;
+	opacity += 0.1;
 	updateGL();
 }
 
 void RaycastingViewer::decMultiplicativeFactorSlot()
 {
-	mult_factor -= 0.1;
+	opacity -= 0.1;
 	updateGL();
 }
 

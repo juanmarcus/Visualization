@@ -46,7 +46,7 @@ fragment_out fragment_main( vertex_fragment IN,
                 uniform sampler3D volume_tex, 
                 uniform sampler1D txf_func,
 			    uniform float stepsize,
-			    uniform float mult_factor
+			    uniform float opacity
 			   )
 		  
 {
@@ -75,7 +75,7 @@ fragment_out fragment_main( vertex_fragment IN,
     {
       value = tex3D(volume_tex,vec).a;
       color_sample = tex1D(txf_func,value);
-      alpha_sample = 1 - exp(-stepsize * mult_factor * color_sample.a);
+      alpha_sample = 1 - exp(-stepsize * opacity * color_sample.a);
       //float v1 = 0.6;
       //float v2 = 0.7;
       
