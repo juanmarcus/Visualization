@@ -24,7 +24,7 @@ public:
 
 	void update();
 
-	double sample(double ix, double iy, double iz);
+	double sample(double nx, double ny, double nz);
 
 private:
 	Nrrd* nin;
@@ -33,6 +33,8 @@ private:
 	gageContext *ctx;
 	gagePerVolume *pvl;
 	const double* result;
+	unsigned int top[3];
+	double min, max[3], size[3];
 };
 
 #endif /* SAMPLER_H_ */

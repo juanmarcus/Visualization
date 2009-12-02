@@ -161,14 +161,18 @@ void NrrdViewer::draw()
 					Vector3 point = ipoints[i];
 
 					// Calculate position on dataset
-					double ix, iy, iz;
+					double nx, ny, nz;
 
-					ix = (point.x + 0.5) * 500.0; // TODO fix this numbers
-					iy = (point.y + 0.5) * 500.0;
-					iz = (point.z + 0.5) * 240.0;
+					nx = (point.x + 0.5);
+					ny = (point.y + 0.5);
+					nz = (point.z + 0.5);
+
+					nx = Math::Clamp(nx, 0.0, 1.0);
+					ny = Math::Clamp(ny, 0.0, 1.0);
+					nz = Math::Clamp(nz, 0.0, 1.0);
 
 					// Sample
-					double value = sampler.sample(ix, iy, iz);
+					double value = sampler.sample(nx, ny, nz);
 
 					// Set sampled value in memory area
 					data[i] = value;
