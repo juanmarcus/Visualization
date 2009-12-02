@@ -19,7 +19,6 @@ ENDFOREACH (cpp_source)
 SET (folders
     "query_ray"
     "view_slices"
-    "tensor_view"
     "workspace"
 )
 

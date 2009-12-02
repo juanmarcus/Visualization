@@ -6,6 +6,8 @@
 #include "ibi_geometry/Intersection.h"
 #include "ibi_interpolation/Interpolation.h"
 #include "TextureConfigurator_Nrrd.h"
+#include <teem/ten.h>
+#include <QtGui/QFileDialog>
 
 NrrdViewer::NrrdViewer(QWidget *parent) :
 	RaycastingViewer(parent)
@@ -65,6 +67,31 @@ void NrrdViewer::toggleShowRayHistogramSlot()
 		break;
 	}
 	updateGL();
+}
+
+void NrrdViewer::openTensorVolumeSlot()
+{
+	QString filename = QFileDialog::getOpenFileName(this, "Open tensor volume",
+			".", "*.nhdr");
+	if (!filename.isEmpty())
+	{
+		Nrrd* tensor_nin = nrrdNew();
+		if (nrrdLoad(tensor_nin, filename.toStdString().c_str(), 0))
+		{
+			char* err = biffGetDone(NRRD);
+			throw Exception("Viewer.cpp", "Problem loading tensor volume.", err);
+		}
+
+		Nrrd* nout = nrrdNew();
+		if (tenAnisoVolume(nout, tensor_nin, tenAniso_Tr, 0.5))
+		{
+			char* err = biffGetDone(TEN);
+			throw Exception("Viewer.cpp", "Problem calculating anisotropy.",
+					err);
+		}
+		nrrdNuke(tensor_nin);
+		setVolume(nout);
+	}
 }
 
 void NrrdViewer::init()
@@ -297,4 +324,10 @@ void NrrdViewer::createActions()
 	connect(toggleShowRayHistogramAct, SIGNAL(triggered()), this,
 			SLOT(toggleShowRayHistogramSlot()));
 	addAction(toggleShowRayHistogramAct);
+
+	openTensorVolumeAct = new QAction(tr("Open tensor volume"), this);
+	openTensorVolumeAct->setShortcut(tr("Ctrl+Shift+O"));
+	connect(openTensorVolumeAct, SIGNAL(triggered()), this,
+			SLOT(openTensorVolumeSlot()));
+	addAction(openTensorVolumeAct);
 }

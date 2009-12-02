@@ -24,6 +24,7 @@ public slots:
 	void toggleRayQuerySlot();
 	void toggleShowRayImageSlot();
 	void toggleShowRayHistogramSlot();
+	void openTensorVolumeSlot();
 
 private:
 	void createActions();
@@ -45,6 +46,7 @@ private:
 	QAction* toggleRayQueryAct;
 	QAction* toggleShowRayImageAct;
 	QAction* toggleShowRayHistogramAct;
+	QAction* openTensorVolumeAct;
 };
 
 #endif // NRRDVIEWER_H
