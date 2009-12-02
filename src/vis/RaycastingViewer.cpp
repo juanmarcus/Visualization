@@ -14,7 +14,7 @@ RaycastingViewer::RaycastingViewer(QWidget *parent) :
 	ibiQGLViewer(parent)
 {
 	toggle_visuals = true;
-	opacity = 3.0;
+	opacity = 1.0;
 	stepsize = 1.0 / 100.0;
 	volume = 0;
 	volume_range = 0;

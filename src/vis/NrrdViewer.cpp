@@ -83,7 +83,7 @@ void NrrdViewer::openTensorVolumeSlot()
 		}
 
 		Nrrd* nout = nrrdNew();
-		if (tenAnisoVolume(nout, tensor_nin, tenAniso_Tr, 0.5))
+		if (tenAnisoVolume(nout, tensor_nin, tenAniso_Ca1, 0.5))
 		{
 			char* err = biffGetDone(TEN);
 			throw Exception("Viewer.cpp", "Problem calculating anisotropy.",
