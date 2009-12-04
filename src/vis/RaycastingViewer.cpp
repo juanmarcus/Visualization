@@ -20,6 +20,9 @@ RaycastingViewer::RaycastingViewer(QWidget *parent) :
 	volume_range = 0;
 	volume_texture = 0;
 	transfer_function = 0;
+	volume_scalex = 1.0;
+	volume_scaley = 1.0;
+	volume_scalez = 1.0;
 
 	createActions();
 	createMenus();
@@ -38,8 +41,6 @@ void RaycastingViewer::init()
 
 	// Set some rendering parameters
 	glDisable(GL_LIGHTING);
-	setSceneRadius(0.8);
-	showEntireScene();
 	setDesiredAspectRatio(1.0);
 
 }
@@ -250,6 +251,7 @@ void RaycastingViewer::draw()
 
 	glPushMatrix();
 
+	glScalef(volume_scalex, volume_scaley, volume_scalez); // scale the texture cube
 	glTranslatef(-0.5, -0.5, -0.5); // center the texture cube
 
 	render_backface();
@@ -284,6 +286,18 @@ void RaycastingViewer::setVolume(Nrrd* nin)
 
 	// Determine volume range
 	volume_range = nrrdRangeNewSet(nin, 0);
+
+	// Determine scaling
+	volume_scalex = nin->axis[0].spaceDirection[0] * nin->axis[0].size;
+	volume_scaley = nin->axis[1].spaceDirection[1] * nin->axis[1].size;
+	volume_scalez = nin->axis[2].spaceDirection[2] * nin->axis[2].size;
+
+	volume_scalex = volume_scalex / volume_scalez;
+	volume_scaley = volume_scaley / volume_scalez;
+	volume_scalez = 1.0;
+
+	setSceneRadius(qMax(qMax(volume_scalex, volume_scaley), qMax(volume_scaley, volume_scalez)));
+	showEntireScene();
 
 }
 

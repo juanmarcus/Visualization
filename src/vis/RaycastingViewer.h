@@ -67,6 +67,7 @@ protected:
 	// Volume data
 	Nrrd* volume;
 	NrrdRange* volume_range;
+	float volume_scalex, volume_scaley, volume_scalez;
 
 	// Textures
 	Texture* volume_texture;
